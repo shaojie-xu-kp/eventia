@@ -1,15 +1,17 @@
-<AirShoppingRQ Version="15.2">
-    <PointOfSale id="Airline-GDS">
+<AirShoppingRQ Version="15.2" xmlns="http://www.iata.org/IATA/EDIST" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.iata.org/IATA/EDIST ../Schema/AirShoppingRQ.xsd">
+    <PointOfSale id="JETBLUENDC_US">
         <Location>
-            <CountryCode>CH</CountryCode>
+            <CountryCode>US</CountryCode>
         </Location>
     </PointOfSale>
-    <Document/>
+    <Document>
+        <ReferenceVersion>15.2</ReferenceVersion>
+    </Document>
     <Party>
         <Sender>
             <TravelAgencySender>
                 <PseudoCity>DUB</PseudoCity>
-                <AgencyID>IATA12345</AgencyID>
+                <AgencyID Owner="JETBLUENDC_US">IATA12345</AgencyID>
             </TravelAgencySender>
         </Sender>
     </Party>
@@ -18,7 +20,7 @@
             <LanguageCode>en</LanguageCode>
         </Languages>
         <CurrCodes>
-            <CurrCode>CHF</CurrCode>
+            <CurrCode>USD</CurrCode>
         </CurrCodes>
     </Parameters>
     <Travelers>
@@ -35,25 +37,46 @@
         <OriginDestinations>
             <OriginDestination>
                 <Departure>
-                    <AirportCode>ZRH</AirportCode>
-                    <Date>2017-07-25</Date>
+                    <AirportCode>JFK</AirportCode>
+                    <Date>2017-07-17</Date>
                 </Departure>
                 <Arrival>
-                    <AirportCode>BCN</AirportCode>
+                    <AirportCode>LAX</AirportCode>
+                </Arrival>
+            </OriginDestination>
+            <OriginDestination>
+                <Departure>
+                    <AirportCode>LAX</AirportCode>
+                    <Date>2017-08-17</Date>
+                </Departure>
+                <Arrival>
+                    <AirportCode>JFK</AirportCode>
                 </Arrival>
             </OriginDestination>
         </OriginDestinations>
     </CoreQuery>
-    <Preferences>
+    <!-- <Preferences>
         <Preference>
-            <!--<FarePreferences>-->
-                <!--<Types>-->
-                    <!--<Type>-->
-                        <!--<Code>70I</Code>-->
-                        <!--<TableName>FF_BUSINESS_NEW</TableName>-->
-                    <!--</Type>-->
-                <!--</Types>-->
-            <!--</FarePreferences>-->
+           <FarePreferences>
+              <Types>
+                 <Type>
+                    <Code>756</Code>
+                 </Type>
+              </Types>
+           </FarePreferences>
+        </Preference>
+     </Preferences> -->
+
+    <!--<Preferences>
+        <Preference>
+            <FarePreferences>
+                <Types>
+                    <Type>
+                        <Code>70I</Code>
+                        <TableName>FF_BUSINESS_NEW</TableName>
+                    </Type>
+                </Types>
+            </FarePreferences>
         </Preference>
         <Preference>
             <FlightPreferences>
@@ -66,5 +89,5 @@
                 </Aircraft>
             </FlightPreferences>
         </Preference>
-    </Preferences>
+    </Preferences>-->
 </AirShoppingRQ>
