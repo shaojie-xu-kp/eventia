@@ -194,16 +194,17 @@
                                           $scope.flight= response.flights[0];
                                           $scope.hotel= response.hotels[0];
                                           $scope.ancillaries= response.ancillaries[0];
-                                          $scope.taxis= response.taxis[0];
+                                          $scope.taxi= response.taxis[0];
                                      }
 
 //origin, numTrav, eventId
-                       function getOffer(eventId){
-                                        $http.get("http://localhost:8085/eventia/offer/eventId")
+                       function getOffer(eventId,origin){
+                                        $http.get("http://localhost:8080/offer/"+eventId+"/"+origin)
                                                         .then(
                                                             function successCallback(response) {
                                                                 console.log("Offer received:");
                                                                 console.log(response.data);
+                                                                $scope.offer=response.data;
                                                                 selectOfferData(response.data);
 
                                                             },
@@ -217,7 +218,7 @@
 
 
 
-                getOffer($scope.eventId);
+                getOffer($scope.requestedEvent.id,$scope.requestedEvent.origin);
 
        });
 

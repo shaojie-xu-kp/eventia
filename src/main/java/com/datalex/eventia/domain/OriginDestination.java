@@ -5,15 +5,9 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Created by shaojie.xu on 20/05/2017.
- */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-public class Taxi {
-
-    private String pickupTime;
-    private String price;
-    private String flightId;
-
+public class OriginDestination {
+    private Departure departure;
+    private Arrival arrival;
 }

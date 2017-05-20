@@ -10,9 +10,10 @@ import lombok.Setter;
  * Created by shaojie.xu on 20/05/2017.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Setter
-@Getter
 @Data
-@EqualsAndHashCode(callSuper=false)
-public class Arrival extends ItineraryBase{
+@EqualsAndHashCode(callSuper = false)
+public class Arrival {
+    private String airportCode;
+    private String date;
+    private String time;
 }

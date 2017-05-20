@@ -5,9 +5,9 @@ package com.datalex.eventia.domain;
  */
 public abstract class ItineraryBase {
 
-    protected String AirportCode;
-    protected String Date;
-    protected String Time;
+    protected String airportCode;
+    protected String date;
+    protected String time;
 
 
 }

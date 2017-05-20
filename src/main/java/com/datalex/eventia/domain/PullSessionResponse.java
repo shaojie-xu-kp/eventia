@@ -1,9 +1,12 @@
 package com.datalex.eventia.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 /**
  * Created by shaojie.xu on 20/05/2017.
@@ -12,10 +15,9 @@ import lombok.Setter;
 @Setter
 @Getter
 @Data
-public class OriginDestinarion {
+public class PullSessionResponse {
 
-    private Departure departure;
-    private Arrival arrival;
-
+    @JsonProperty("hotels_prices")
+    List<HotelPriceInfo> hotelsPrices;
 
 }

@@ -54,6 +54,7 @@ public class AirportLocatingService {
 
         HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
         ResponseEntity<SitaAirportResponse> responseEntity = restTemplate.exchange(request, HttpMethod.GET, entity, SitaAirportResponse.class);
+
         if (responseEntity.hasBody()) {
             SitaAirportResponse response = responseEntity.getBody();
             if (SUCCESS_TRUE.equals(response.getSuccess())) {

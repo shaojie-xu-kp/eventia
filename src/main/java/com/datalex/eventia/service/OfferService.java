@@ -1,9 +1,8 @@
 package com.datalex.eventia.service;
 
 import com.datalex.eventia.ApplicationProperties;
-import com.datalex.eventia.Converter.ConvertService;
-import com.datalex.eventia.domain.Coordinate;
-import com.datalex.eventia.domain.Offer;
+import com.datalex.eventia.converter.ConvertService;
+import com.datalex.eventia.domain.*;
 import com.datalex.eventia.dto.predictHQ.Event;
 import org.iata.iata.edist.AirShopReqAttributeQueryType;
 import org.iata.iata.edist.AirShoppingRQ;
@@ -18,9 +17,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
-import java.util.TimeZone;
 
 /**
  * Created by shaojie.xu on 20/05/2017.
@@ -70,8 +69,58 @@ public class OfferService {
         AirShoppingRQ rq = getAirShoppingRQ(origin, eventId);
 
         AirShoppingRS flights = airShoppingService.findFlights(rq);
+        Offer offer = airShopingRSOfferConverterService.convert(flights);
+        offer.setHotels(createDummyHotels());
+        offer.setTaxis(createDummyTaxis());
+        offer.setAncillaries(createDummyAncillaries());
+        return offer;
+    }
 
-        return airShopingRSOfferConverterService.convert(flights);
+    private List<Ancillary> createDummyAncillaries() {
+        List<Ancillary> list = new ArrayList<>();
+        Ancillary anc = new Ancillary();
+        anc.setDescription("Even more seats");
+        anc.setPrice("20");
+        list.add(anc);
+         anc = new Ancillary();
+        anc.setDescription("Even more speed");
+        anc.setPrice("40");
+        list.add(anc);
+        return list;
+    }
+
+    private List<Taxi> createDummyTaxis() {
+        List<Taxi> taxis = new ArrayList<>();
+        Taxi taxi = new Taxi();
+        taxi.setFlightId("111");
+        taxi.setPickupTime("14:00");
+        taxi.setPrice("10");
+        taxis.add(taxi);
+        taxi = new Taxi();
+        taxi.setFlightId("222");
+        taxi.setPickupTime("17:00");
+        taxi.setPrice("15");
+        taxis.add(taxi);
+        return taxis;
+    }
+
+    private List<Hotel> createDummyHotels() {
+        List<Hotel> hotels = new ArrayList<Hotel>();
+        Hotel hotel = new Hotel();
+        hotel.setDistanceToPlace("1km");
+        hotel.setNights("3");
+        hotel.setPrice("300");
+        hotel.setRoomStay("Double room");
+        hotel.setStars("3");
+        hotels.add(hotel);
+        hotel = new Hotel();
+        hotel.setDistanceToPlace("1km");
+        hotel.setNights("3");
+        hotel.setPrice("500");
+        hotel.setRoomStay("Double room");
+        hotel.setStars("4");
+        hotel = new Hotel();
+        return hotels;
     }
 
 
