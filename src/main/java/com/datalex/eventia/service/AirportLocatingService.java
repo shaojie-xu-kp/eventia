@@ -2,6 +2,7 @@ package com.datalex.eventia.service;
 
 import com.datalex.eventia.ApplicationProperties;
 import com.datalex.eventia.domain.Coordinate;
+import com.datalex.eventia.dto.sita.Airport;
 import com.datalex.eventia.dto.sita.SitaAirportResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -11,62 +12,59 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
-
-/**
- * Created by shaojie.xu on 19/05/2017.
- */
 @Service
 public class AirportLocatingService {
 
-        @Autowired
-        RestTemplate restTemplate;
+    @Autowired
+    RestTemplate restTemplate;
 
-        @Autowired
-        ApplicationProperties applicationProperties;
+    @Autowired
+    ApplicationProperties applicationProperties;
 
-        public static final String NO_AIRPORT_FOUND = "no airport found";
+    public static final String NO_AIRPORT_FOUND = "no airport found";
 
-        private static final String SUCCESS_TRUE = "true";
+    private static final String SUCCESS_TRUE = "true";
 
-        private HttpHeaders headers;
+    private HttpHeaders headers;
 
-        @PostConstruct
-        private void init(){
-                headers = new HttpHeaders();
-                headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-                headers.add(applicationProperties.getSitaAuthorizationKey(), applicationProperties.getSitaAuthorizationValue());
+    @PostConstruct
+    private void init() {
+        headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.add(applicationProperties.getSitaAuthorizationKey(), applicationProperties.getSitaAuthorizationValue());
+    }
+
+    public static final String SLASH = "/";
+
+    public List<String> localNearestAirports(Coordinate coordinate) {
+
+        String request = UriComponentsBuilder
+                .fromHttpUrl(applicationProperties.getAirportLocatingCoordinateUrl()
+                        + coordinate.getLatitude()
+                        + SLASH
+                        + coordinate.getLongitude())
+                .queryParam("maxAirports", 10)
+                .build()
+                .encode()
+                .toUriString();
+
+        HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
+        ResponseEntity<SitaAirportResponse> responseEntity = restTemplate.exchange(request, HttpMethod.GET, entity, SitaAirportResponse.class);
+        if (responseEntity.hasBody()) {
+            SitaAirportResponse response = responseEntity.getBody();
+            if (SUCCESS_TRUE.equals(response.getSuccess())) {
+                return response.getAirports().stream()
+                        .map(Airport::getIatacode)
+                        .collect(Collectors.toList());
+            }
         }
+        return Collections.singletonList(NO_AIRPORT_FOUND);
 
-        public static final String SLASH = "/";
-
-        public String localNearestAirport(Coordinate coordinate){
-
-                String request = UriComponentsBuilder
-                        .fromHttpUrl(applicationProperties.getAirportLocatingCoordinateUrl()
-                                                        + coordinate.getLatitude()
-                                                        + SLASH
-                                                        + coordinate.getLongitude())
-                        .build()
-                        .encode()
-                        .toUriString();
-                HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
-                ResponseEntity<SitaAirportResponse> responseEntity = restTemplate.exchange(request, HttpMethod.GET, entity, SitaAirportResponse.class);
-                if(responseEntity.hasBody())
-                {
-                        SitaAirportResponse response = responseEntity.getBody();
-                        if(SUCCESS_TRUE.equals(response.getSuccess()))
-                        {
-                                return  response.getAirports().stream()
-                                        .map(airport -> airport.getIatacode())
-                                        .findAny()
-                                        .orElse(NO_AIRPORT_FOUND);
-                        }
-                }
-
-                return NO_AIRPORT_FOUND;
-
-        }
+    }
 
 
 }

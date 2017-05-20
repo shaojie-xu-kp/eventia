@@ -6,6 +6,8 @@ import com.datalex.eventia.service.AirShoppingService;
 import com.datalex.eventia.service.AirportLocatingService;
 import com.datalex.eventia.service.PredictHQEventService;
 import org.apache.commons.lang3.StringUtils;
+import org.iata.iata.edist.AirShopReqAttributeQueryType;
+import org.iata.iata.edist.AirShopReqAttributeQueryType.OriginDestination;
 import org.iata.iata.edist.AirShoppingRQ;
 import org.iata.iata.edist.AirShoppingRS;
 import org.junit.Test;
@@ -29,6 +31,7 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -82,6 +85,7 @@ public class EventiaApplicationTests {
     @Test
     public void endToEnd() throws Exception {
         String eventName = "Dirty Heads with SOJA";
+        LocalDate now = LocalDate.now();
         String origin = "JFK";
         List<Event> events = predictHQEventService.getEvents("BOS");
         Event e = events.stream()
@@ -91,12 +95,23 @@ public class EventiaApplicationTests {
         String lon = e.getLocation().get(0);
         String lat = e.getLocation().get(1);
         Coordinate coordinate = new Coordinate(lon, lat);
-        String airport = airportLocatingService.localNearestAirport(coordinate);
+        List<String> airports = airportLocatingService.localNearestAirports(coordinate);
         AirShoppingRQ rq = (AirShoppingRQ) unmarshalObject("AirShoppingRQ.xml");
-        rq.getCoreQuery().getOriginDestinations().getOriginDestination()
-                .get(0).getDeparture().getAirportCode().setValue(origin);
-        rq.getCoreQuery().getOriginDestinations().getOriginDestination()
-                .get(0).getArrival().getAirportCode().setValue(airport);
-        System.out.println(airport);
+        OriginDestination outbound = rq.getCoreQuery().getOriginDestinations().getOriginDestination().get(0);
+        outbound.getDeparture().getAirportCode().setValue(origin);
+        String airport = airports.get(0);
+        outbound.getArrival().getAirportCode().setValue(airport);
+        outbound.getDeparture().setDate(now.plusMonths(2));
+
+        OriginDestination inbound = rq.getCoreQuery().getOriginDestinations().getOriginDestination().get(1);
+        inbound.getDeparture().getAirportCode().setValue(airport);
+        inbound.getArrival().getAirportCode().setValue(origin);
+        inbound.getDeparture().setDate(now.plusMonths(2).plusDays(4));
+
+        AirShoppingRS flights = airShoppingService.findFlights(rq);
+
+        unmarshaller.marshal(flights, new StreamResult(System.out));
+
+        // TODO: adjust dates, filter airports, calculate distances (google), hotels (skyscanner), ground transport (uber, indigo)
     }
 }

@@ -7,8 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.assertTrue;
+import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created by shaojie.xu on 19/05/2017.
@@ -26,14 +27,14 @@ public class AirportLocatingServiceTest {
 
     @Test
     public void testAirportAmsterdam(){
-        String airports = airportLocatingService.localNearestAirport(new Coordinate("4.879903", "52.297097"));
-        assertTrue(airports.equals(IATA_AMS));
+        List<String> airports = airportLocatingService.localNearestAirports(new Coordinate("4.879903", "52.297097"));
+        assertThat(airports).contains(IATA_AMS);
     }
 
     @Test
     public void testAirportNewyork(){
-        String airports = airportLocatingService.localNearestAirport(new Coordinate("-73.850201", "40.679196"));
-        assertTrue(airports.equals(IATA_JFK));
+        List<String> airports = airportLocatingService.localNearestAirports(new Coordinate("-73.850201", "40.679196"));
+        assertThat(airports).contains(IATA_JFK);
     }
 
 
