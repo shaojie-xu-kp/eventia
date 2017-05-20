@@ -144,6 +144,9 @@
                        $scope.searchCriteria.departureDate = $filter('date')($scope.eventsByName[selectedItem.label].start, "yyyy-MM-dd");
        //                $scope.eventsByName[selectedItem.label].start;
                        $scope.searchCriteria.arrivalDate = $filter('date')($scope.eventsByName[selectedItem.label].end, "yyyy-MM-dd");
+                       $scope.searchCriteria.id = $scope.eventsByName[selectedItem.label].id;
+                       $scope.searchCriteria.title = $scope.eventsByName[selectedItem.label].title;
+                       console.log("ID of selected event = " + $scope.searchCriteria.id);
                    }
        //            alert("2");
                }
@@ -169,6 +172,7 @@
                                console.log("goToResults()");
                                  $location.path("/results");
                                  $rootScope.sampleValue = "something";
+                                 $rootScope.searchCriteria = $scope.searchCriteria;
                            }
            });
 
@@ -180,25 +184,15 @@
 
             console.log("resultController");
             console.log("sampleValue = " + $rootScope.sampleValue);
+            console.log("Search criteria object: ");
+            console.log($rootScope.searchCriteria);
+            $scope.requestedEvent = $rootScope.searchCriteria;
 
-              function getEvent(){
-                    $http.get("http://localhost:8085/eventia/event")
-                                    .then(
-                                        function successCallback(response) {
-                                            console.log("Event received:");
-                                            console.log(response.data);
-                                            $scope.event = response.data;
-                                        },
-                                        function errorCallback(response) {
-                                            console.log("Unable to get event"+response);
-                                            $scope.errorMessage = "Unable to get event";
-                                        });
 
-                    }
 
                       function selectOfferData(response){
                                           $scope.flight= response.flights[0];
-                                          $scope.hotel= response.hoteles[0];
+                                          $scope.hotel= response.hotels[0];
                                           $scope.ancillaries= response.ancillaries[0];
                                           $scope.taxis= response.taxis[0];
                                      }
@@ -222,7 +216,7 @@
 
 
 
-                getEvent();
+
                 getOffer($scope.eventId);
 
        });
