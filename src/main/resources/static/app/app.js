@@ -202,12 +202,117 @@
 
        eventiaApp.controller('resultController', function($rootScope, $scope, $http, $timeout,  $location)  {
 
+            // Dominique - moved init to the end of the controller definition
+            // (so that all dependent functions have been defined)
+
+            // Dominique
+            $scope.toggleSummary = function() {
+                $scope.showSummary = !$scope.showSummary;
+                $scope.showOverview = !$scope.showOverview;
+                if ($scope.showSummary) {
+                    $scope.otherViewLabel = "Overview";
+                } else {
+                    $scope.otherViewLabel = "Summary";
+                }
+            }
+
+            $scope.toggleBiais = function() {
+                console.log("toggleBiais()");
+                $scope.priceBiais = !$scope.priceBiais;
+                $scope.flexBiais= !$scope.flexBiais;
+                if ($scope.priceBiais) {
+                    $scope.biaisLabel = "Flex Biais";
+                } else {
+                    $scope.biaisLabel = "Price Biais";
+                }
+            }
+
+            // Fusion Charts
+
+            $rootScope.generateChart = function() {
+                console.log("initializing fusion charts ...");
+                var fusioncharts = new FusionCharts({
+                    type: 'doughnut2d',
+                    renderAt: 'chart-container',
+                    width: '100%',
+                    height: '1000',
+                    dataFormat: 'json',
+                    dataSource: {
+                        "chart": {
+                            "caption": "Your Itinerary",
+                            "subCaption": "Selected by Eventia Smart Engine",
+                            // caption cosmetics
+                            "captionFont": "Arial",
+                            "captionFontSize": "36",
+                            "captionFontColor": "#AAAAAA",
+                            "captionFontBold": "1",
+                            "subcaptionFont": "Arial",
+                            "subcaptionFontSize": "24",
+                            "subcaptionFontColor": "#AAAAAA",
+                            "subcaptionFontBold": "0",
+                            // end caption cosmetics
+                            // label cosmetics
+                            "labelFont": "Arial",
+                            "labelFontColor": "000080",
+                            "labelFontSize": "36",
+                            //        "labelBorderColor": "000000",
+                            //        "labelBorderPadding": "5",
+                            //        "labelBorderRadius": "2",
+                            //        "labelBorderDashed": "1",
+                            // end label cosmetics
+                            "numberPrefix": "$",
+                            "showBorder": "0",
+                            "use3DLighting": "0",
+                            "enableSmartLabels": "0",
+                            "startingAngle": "310",
+                            "showLabels": "0",
+                            "showPercentValues": "1",
+                            "showLegend": "1",
+                            "defaultCenterLabel": "Total: $1,280",
+                            "centerLabel": "$label: $value",
+                            "centerLabelBold": "1",
+                            "showTooltip": "0",
+                            "decimals": "0",
+                            "useDataPlotColorForLabels": "1",
+                            "theme": "fint"
+                        },
+                        "data": [{
+                            "label": "Air",
+                            "value": "780"
+                            }, {
+                            "label": "Taxi",
+                            "value": "50"
+                            }, {
+                            "label": "Hotel",
+                            "value": "347"
+                            }, {
+                            "label": "Golf",
+                            "value": "120"
+                            }
+                        ]
+                    }
+                });
+                console.log("ready to render ...");
+
+                fusioncharts.render();
+                console.log("done rendering fusion charts");
+             }
+
+
             console.log("resultController");
             console.log("sampleValue = " + $rootScope.sampleValue);
             console.log("Search criteria object: ");
             console.log($rootScope.searchCriteria);
-            $scope.offer = $rootScope.offer;
-
+            $scope.requestedEvent = $rootScope.searchCriteria;
+            // Dominique
+            $scope.showSummary = true;
+            $scope.showOverview = false;
+            $scope.otherViewLabel = "Overview";
+            $scope.priceBiais = true;
+            $scope.flexBiais = false;
+            $scope.biaisLabel = "Flex Biais";
+            // note: this will have to be triggered when the results have been received from the server
+             $rootScope.generateChart();
 
 
                       function selectOfferData(response){

@@ -1,3 +1,68 @@
+.eventia-header {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background-color: red;
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+}
+
+.large-text {
+    font-size: 5em;
+}
+
+.medium-text {
+    font-size: 3em;
+}
+
+.normal-text {
+    font-size: 2em;
+}
+
+.small-text {
+    font-size: 1em;
+}
+
+.itin-info-color {
+    color: #337ab7;
+    font-weight: bold;
+}
+
+.low-key-text {
+    color: #333333;
+}
+
+.horizontal-spacer-large {
+    height: 100px;
+    background-color: none;
+}
+
+.horizontal-spacer-med {
+    height: 50px;
+    background-color: none;
+}
+
+.horizontal-spacer-small {
+    height: 25px;
+}
+
+.trip-info {
+    background-color: #E1E1E1;
+    padding: 20px;
+    border: 1px solid silver;
+}
+
+.trip-detail {
+    background-color: #EFEFEF;
+}
+
+.trip-controls {
+    background-color: none;
+    padding: 20px;
+    border: 1px solid silver;
+}
+
 body {
   padding-top: 40px;
   padding-bottom: 40px;
