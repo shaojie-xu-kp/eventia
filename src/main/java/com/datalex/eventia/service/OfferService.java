@@ -1,6 +1,7 @@
 package com.datalex.eventia.service;
 
 import com.datalex.eventia.ApplicationProperties;
+import com.datalex.eventia.converter.AirShoppingRSOfferConverterService;
 import com.datalex.eventia.converter.ConvertService;
 import com.datalex.eventia.domain.Coordinate;
 import com.datalex.eventia.domain.Offer;
@@ -31,7 +32,7 @@ public class OfferService {
     AirShoppingService airShoppingService;
 
     @Autowired
-    ConvertService<AirShoppingRS, Offer> airShopingRSOfferConverterService;
+    AirShoppingRSOfferConverterService airShopingRSOfferConverterService;
 
     @Autowired
     AirportLocatingService airportLocatingService;
@@ -64,31 +65,21 @@ public class OfferService {
         return joiner.add("classpath").add(fileName).toString();
     }
 
-    public Offer getBestOffer(String origin, String eventId){
-
-        AirShoppingRQ rq = getAirShoppingRQ(origin, eventId);
+    public Offer getBestOffer(String origin, String eventId) {
+        Event e = predictHQEventService.getEventById(eventId);
+        String destination = findClosestJetBlueAirport(e);
+        AirShoppingRQ rq = getAirShoppingRQ(origin, e, destination);
 
         AirShoppingRS flights = airShoppingService.findFlights(rq);
 
-        return airShopingRSOfferConverterService.convert(flights);
+        return airShopingRSOfferConverterService.convert(flights, origin, destination);
     }
 
 
-    public AirShoppingRQ getAirShoppingRQ(String origin, String eventId) {
-        Event e = predictHQEventService.getEventById(eventId);
+    public AirShoppingRQ getAirShoppingRQ(String origin, Event e, String airport) {
         ZoneId zondIdDestinaion = ZoneId.of(e.getTimezone());
         LocalDate eventStartLocalDate = e.getStart().toInstant().atZone(zondIdDestinaion).toLocalDate();
         LocalDate eventEndLocalDate = e.getEnd().toInstant().atZone(zondIdDestinaion).toLocalDate();
-
-        String lon = e.getLocation().get(0);
-        String lat = e.getLocation().get(1);
-        Coordinate coordinate = new Coordinate(lon, lat);
-        List<String> airports = airportLocatingService.localNearestAirports(coordinate);
-
-        String airport = airports.stream()
-                                    .filter(ap -> properties.getPreLoadedCities().contains(ap))
-                                    .findFirst()
-                                    .orElse("");
 
         AirShoppingRQ rq = null;
         try {
@@ -110,13 +101,24 @@ public class OfferService {
         return rq;
     }
 
+    private String findClosestJetBlueAirport(Event e) {
+        String lon = e.getLocation().get(0);
+        String lat = e.getLocation().get(1);
+        Coordinate coordinate = new Coordinate(lon, lat);
+        List<String> airports = airportLocatingService.localNearestAirports(coordinate);
 
-    public static void main(String... args){
+        return airports.stream()
+                .filter(ap -> properties.getPreLoadedCities().contains(ap))
+                .findFirst()
+                .orElse("");
+    }
+
+
+    public static void main(String... args) {
 
         ZoneId id1 = ZoneId.of("America/New_York");
         System.out.println(id1);
     }
-
 
 
 }

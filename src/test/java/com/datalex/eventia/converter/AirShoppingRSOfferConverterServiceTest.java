@@ -22,7 +22,7 @@ import java.util.StringJoiner;
 public class AirShoppingRSOfferConverterServiceTest {
 
     @Autowired
-    AirShopingRSOfferConverterService airShopingRSOfferConverterService;
+    AirShoppingRSOfferConverterService airShoppingRSOfferConverterService;
 
     @Autowired
     private Jaxb2Marshaller unmarshaller;
@@ -45,7 +45,7 @@ public class AirShoppingRSOfferConverterServiceTest {
     @Test
     public void test() throws Exception {
         AirShoppingRS rs = (AirShoppingRS) unmarshalObject("AirShoppingRS.xml");
-        Offer offer = airShopingRSOfferConverterService.convert(rs);
+        Offer offer = airShoppingRSOfferConverterService.convert(rs);
         List<Flight> flights = offer.getFlights();
         System.out.println(flights.get(0));
     }
