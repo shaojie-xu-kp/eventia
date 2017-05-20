@@ -1,20 +1,20 @@
-package com.datalex.eventia.domain;
+package com.datalex.eventia.Exception;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
  * Created by shaojie.xu on 20/05/2017.
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 @Setter
 @Getter
 @Data
-@EqualsAndHashCode(callSuper=false)
-public class Departure extends ItineraryBase{
+@AllArgsConstructor
+public class ApplicationException extends RuntimeException{
 
+    private String error;
 
 }

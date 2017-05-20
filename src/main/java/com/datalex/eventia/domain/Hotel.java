@@ -2,7 +2,6 @@ package com.datalex.eventia.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,8 +12,12 @@ import lombok.Setter;
 @Setter
 @Getter
 @Data
-@EqualsAndHashCode(callSuper=false)
-public class Departure extends ItineraryBase{
+public class Hotel {
 
-
+    private String name;
+    private String distanceToPlace;
+    private String stars;
+    private String price;
+    private String nights;
+    private String roomStay;
 }

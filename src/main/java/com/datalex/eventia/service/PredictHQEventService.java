@@ -1,6 +1,7 @@
 package com.datalex.eventia.service;
 
 import com.datalex.eventia.ApplicationProperties;
+import com.datalex.eventia.Exception.ApplicationException;
 import com.datalex.eventia.dto.predictHQ.Event;
 import com.datalex.eventia.dto.predictHQ.PredictHQResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,14 @@ public class PredictHQEventService implements EventService {
     @Override
     public List<Event> getPreLoadedEvents() {
         return preLoadedEvents;
+    }
+
+    @Override
+    public Event getEventById(String id) {
+        return preLoadedEvents.stream()
+                .filter(event -> event.getId().equals(id))
+                .findFirst()
+                .orElse(null);
     }
 
 }

@@ -10,4 +10,6 @@ public interface EventService {
 
     List<Event> getPreLoadedEvents();
 
+    Event getEventById(String id);
+
 }
