@@ -29,7 +29,7 @@ public class PredictHQEventService implements EventService {
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         String request = UriComponentsBuilder.fromHttpUrl(properties.getPredictHqUrl())
-                .queryParam("place", city)
+                .queryParam("place.exact", city)
                 .build()
                 .encode()
                 .toUriString();

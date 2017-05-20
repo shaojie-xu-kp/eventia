@@ -1,6 +1,10 @@
 package com.datalex.eventia;
 
+import com.datalex.eventia.domain.Coordinate;
+import com.datalex.eventia.dto.predictHQ.Event;
 import com.datalex.eventia.service.AirShoppingService;
+import com.datalex.eventia.service.AirportLocatingService;
+import com.datalex.eventia.service.PredictHQEventService;
 import org.apache.commons.lang3.StringUtils;
 import org.iata.iata.edist.AirShoppingRQ;
 import org.iata.iata.edist.AirShoppingRS;
@@ -25,6 +29,7 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.StringJoiner;
 
 import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
@@ -38,9 +43,12 @@ public class EventiaApplicationTests {
     private Jaxb2Marshaller unmarshaller;
     @Autowired
     private ResourceLoader resourceLoader;
-
     @Autowired
     private AirShoppingService airShoppingService;
+    @Autowired
+    private PredictHQEventService predictHQEventService;
+    @Autowired
+    private AirportLocatingService airportLocatingService;
 
     Object unmarshalObject(String filePath) throws IOException {
         try (InputStream is = resourceLoader.getResource(buildPath(filePath)).getInputStream()) {
@@ -69,5 +77,26 @@ public class EventiaApplicationTests {
         unmarshaller.marshal(flights, new StreamResult(System.out));
         int size = flights.getOffersGroup().getAirlineOffers().size();
         System.out.println(size);
+    }
+
+    @Test
+    public void endToEnd() throws Exception {
+        String eventName = "Dirty Heads with SOJA";
+        String origin = "JFK";
+        List<Event> events = predictHQEventService.getEvents("BOS");
+        Event e = events.stream()
+                .filter(event -> event.getTitle().equals(eventName))
+                .findFirst()
+                .orElseThrow(RuntimeException::new);
+        String lon = e.getLocation().get(0);
+        String lat = e.getLocation().get(1);
+        Coordinate coordinate = new Coordinate(lon, lat);
+        String airport = airportLocatingService.localNearestAirport(coordinate);
+        AirShoppingRQ rq = (AirShoppingRQ) unmarshalObject("AirShoppingRQ.xml");
+        rq.getCoreQuery().getOriginDestinations().getOriginDestination()
+                .get(0).getDeparture().getAirportCode().setValue(origin);
+        rq.getCoreQuery().getOriginDestinations().getOriginDestination()
+                .get(0).getArrival().getAirportCode().setValue(airport);
+        System.out.println(airport);
     }
 }
