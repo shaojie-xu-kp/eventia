@@ -1,6 +1,7 @@
 package com.datalex.eventia;
 
-import org.iata.iata.edist.*;
+import org.iata.iata.edist.AirShoppingRQ;
+import org.iata.iata.edist.AirShoppingRS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
