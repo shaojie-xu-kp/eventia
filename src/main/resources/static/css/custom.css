@@ -1,0 +1,39 @@
+body {
+  padding-top: 40px;
+  padding-bottom: 40px;
+ // background-color: #eee;
+ font-family: 'Open Sans', sans-serif;
+}
+
+input.form-fixer {
+    padding: 20px;
+}
+
+.show {
+    display: block;
+    margin-left: 15px;
+}
+
+.center {
+    margin: auto;
+    width: 70%;
+    padding: 10px;
+}
+
+.orange-hr {
+    border-color: #F05F40;
+    border-width: 3px;
+    max-width: 50px;
+}
+
+.yellow-hr {
+   border-color: #F05F40;
+      border-width: 1px;
+      max-width: 500px;
+}
+
+.bpad {
+	padding-bottom: 15px;
+}
+
+

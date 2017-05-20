@@ -1,0 +1,68 @@
+<script type="text/ng-template" id="customTemplate.html">
+    <a>
+        <img ng-src="http://upload.wikimedia.org/wikipedia/commons/thumb/{{match.model.flag}}" width="16">
+        <span ng-bind-html="match.label | uibTypeaheadHighlight:query"></span>
+    </a>
+</script>
+
+
+<div class="container container-fluid typeahead-demo">
+
+    <br/><br/>
+
+
+    <form>
+        <!--<h2 class="form-signin-heading">Please sign in</h2>-->
+        <div class="">
+            <div class="row form-group">
+                <div class="col-lg-offset-4 col-lg-4 col-lg-offset-4">
+                    <input type="text" ng-model="selectedEvent"
+                           placeholder="Type event name here"
+                           typeahead-on-select="testingSelect($item)"
+                           uib-typeahead="state for state in states | filter:$viewValue | limitTo:8"
+                           class="form-control form-fixer">
+                </div>
+            </div>
+            <div class="row form-group" ng-if="eventSelectedFlag">
+                <div class="col-lg-3">
+                    <input ng-model="searchCriteria.origin" class="form-control form-fixer" ng-model="origin"
+                           placeholder="Origin" required autofocus>
+                </div>
+                <div class="col-lg-3" data-provide="datepicker">
+                    <input ng-model="searchCriteria.departureDate" id="dateArrival" name="dateArrival"
+                           class="form-control form-fixer date" placeholder="Arrival" required autofocus>
+                </div>
+                <div class="col-lg-3" data-provide="datepicker">
+                    <input ng-model="searchCriteria.arrivalDate" id="dateDeparture" name="dateDeparture"
+                           class="form-control form-fixer" placeholder="Departure" required autofocus>
+                </div>
+                <div class="col-lg-3">
+                    <input ng-model="searchCriteria.travelerNbr" class="form-control form-fixer"
+                           placeholder="Number of travellers" required autofocus>
+                </div>
+            </div>
+            <div class="row form-group">
+                <div class="col-lg-offset-4 col-lg-4 col-lg-offset-4">
+                    <button ng-click="goToResults()" class="btn btn-lg btn-primary btn-block" type="submit">Search
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <br>
+    <br>
+
+
+</div>
+
+
+<script>
+     $(function() {
+      $("#dateArrival,#dateDeparture")
+        .datepicker({
+         dateFormat : 'dd/mm/yy'
+        }).val();
+      $('#eventTitler').datepicker();
+     });
+
+</script>
