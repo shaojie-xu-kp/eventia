@@ -1,6 +1,7 @@
 package com.datalex.eventia.service;
 
 import com.datalex.eventia.ApplicationProperties;
+import com.datalex.eventia.converter.AirShoppingRSOfferConverterService;
 import com.datalex.eventia.converter.ConvertService;
 import com.datalex.eventia.domain.*;
 import com.datalex.eventia.dto.predictHQ.Event;
@@ -31,7 +32,7 @@ public class OfferService {
     AirShoppingService airShoppingService;
 
     @Autowired
-    ConvertService<AirShoppingRS, Offer> airShopingRSOfferConverterService;
+    AirShoppingRSOfferConverterService airShopingRSOfferConverterService;
 
     @Autowired
     AirportLocatingService airportLocatingService;
@@ -71,18 +72,10 @@ public class OfferService {
 
         AirShoppingRS flights = airShoppingService.findFlights(rq);
 
-        return airShopingRSOfferConverterService.convert(flights, origin, destination);
-    }
-
-    public Offer getBestOffer(String origin, String eventId){
-
-        AirShoppingRQ rq = getAirShoppingRQ(origin, eventId);
-
-        AirShoppingRS flights = airShoppingService.findFlights(rq);
-        Offer offer = airShopingRSOfferConverterService.convert(flights);
+        Offer offer = airShopingRSOfferConverterService.convert(flights, origin, destination);
+        offer.setAncillaries(createDummyAncillaries());
         offer.setHotels(createDummyHotels());
         offer.setTaxis(createDummyTaxis());
-        offer.setAncillaries(createDummyAncillaries());
         return offer;
     }
 
@@ -115,7 +108,7 @@ public class OfferService {
     }
 
     private List<Hotel> createDummyHotels() {
-        List<Hotel> hotels = new ArrayList<Hotel>();
+        List<Hotel> hotels = new ArrayList<>();
         Hotel hotel = new Hotel();
         hotel.setDistanceToPlace("1km");
         hotel.setNights("3");
