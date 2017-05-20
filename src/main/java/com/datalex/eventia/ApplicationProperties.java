@@ -19,5 +19,15 @@ public class ApplicationProperties {
     private String sitaAuthorizationKey;
     private String sitaAuthorizationValue;
     private List<String> preLoadedCities;
+    private String hotelIndividualId;
+    private String skyscannerApiKey;
+    private String skyscannerUrlCreateSession;
+    private String skyscannerUrlBase;
+    private String skyscannerUrlBaseCreateDetail;
+    private String skyscannerUrlBasePullDetail;
+    private String skyscannerStartDatePlaceHolder;
+    private String skyscannerEndDatePlaceHolder;
+    private String skyscannerSessionApiPlaceHolder;
+    private String skyscannerHotelIdPlaceHolder;
 
 }
