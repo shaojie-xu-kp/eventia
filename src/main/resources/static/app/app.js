@@ -150,7 +150,27 @@
                    }
        //            alert("2");
                }
+                function getOffer(eventId,origin){
+                                       // $http.get("http://localhost:8080/offer/"+eventId+"/"+origin)
 
+
+                                    $http.get("http://localhost:8085/offer")
+                                                        .then(
+                                                            function successCallback(response) {
+                                                             $('#loader').show();
+                                                                console.log("Offer received:");
+                                                                console.log(response.data);
+                                                               $rootScope.offer=response.data;
+                                                               console.log("loading...");
+                                                                $('#loader').hide();
+                                                                $location.path("/results");
+                                                            },
+                                                            function errorCallback(response) {
+                                                                console.log("Unable to get event"+response);
+                                                                $scope.errorMessage = "Unable to get event";
+                                                            });
+
+                                        }
                $scope.selectEvent = function() {
                    $scope.eventSelected = true;
                }
@@ -170,9 +190,9 @@
 
                 $scope.goToResults = function() {
                                console.log("goToResults()");
-                                 $location.path("/results");
                                  $rootScope.sampleValue = "something";
                                  $rootScope.searchCriteria = $scope.searchCriteria;
+                                  getOffer($scope.searchCriteria.id,$scope.searchCriteria.origin);
                            }
            });
 
@@ -186,7 +206,7 @@
             console.log("sampleValue = " + $rootScope.sampleValue);
             console.log("Search criteria object: ");
             console.log($rootScope.searchCriteria);
-            $scope.requestedEvent = $rootScope.searchCriteria;
+            $scope.offer = $rootScope.offer;
 
 
 
@@ -197,28 +217,8 @@
                                           $scope.taxi= response.taxis[0];
                                      }
 
-//origin, numTrav, eventId
-                       function getOffer(eventId,origin){
-                                        $http.get("http://localhost:8080/offer/"+eventId+"/"+origin)
-                                                        .then(
-                                                            function successCallback(response) {
-                                                                console.log("Offer received:");
-                                                                console.log(response.data);
-                                                                $scope.offer=response.data;
-                                                                selectOfferData(response.data);
 
-                                                            },
-                                                            function errorCallback(response) {
-                                                                console.log("Unable to get event"+response);
-                                                                $scope.errorMessage = "Unable to get event";
-                                                            });
-
-                                        }
-
-
-
-
-                getOffer($scope.requestedEvent.id,$scope.requestedEvent.origin);
+                 selectOfferData($scope.offer );
 
        });
 
