@@ -11,5 +11,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ApplicationProperties {
 
     private String host;
+    private String predictHqAuthorizationKey;
+    private String predictHqUrl;
+    private String airportLocatingCoordinateUrl;
+    private String sitaAuthorizationKey;
+    private String sitaAuthorizationValue;
 
 }
