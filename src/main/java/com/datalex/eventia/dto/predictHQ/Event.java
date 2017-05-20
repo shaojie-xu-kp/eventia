@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Event {
+    private String id;
     private String title;
     private String description;
     private String category;
