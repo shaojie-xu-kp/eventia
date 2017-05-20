@@ -4,6 +4,7 @@ import com.datalex.eventia.ApplicationProperties;
 import com.datalex.eventia.dto.predictHQ.Event;
 import com.datalex.eventia.dto.predictHQ.PredictHQResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -12,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PredictHQEventService implements EventService {
@@ -22,6 +25,16 @@ public class PredictHQEventService implements EventService {
 
     @Autowired
     private ApplicationProperties properties;
+
+    private List<Event> preLoadedEvents;
+
+    @PostConstruct
+    private void init(){
+        preLoadedEvents = properties.getPreLoadedCities()
+                                    .stream()
+                                     .flatMap(city -> getEvents(city).stream())
+                                     .collect(Collectors.toList());
+    }
 
     public List<Event> getEvents(String city) {
         HttpHeaders headers = new HttpHeaders();
@@ -39,5 +52,9 @@ public class PredictHQEventService implements EventService {
         return exchange.getBody().getResults();
     }
 
+    @Override
+    public List<Event> getPreLoadedEvents() {
+        return preLoadedEvents;
+    }
 
 }
