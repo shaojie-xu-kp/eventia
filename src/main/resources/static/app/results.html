@@ -4,7 +4,7 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-12" style="height: 200px; overflow: hidden;">
-                <img src="img/header_background.jpg" width="100%"/>
+                <img src="img/header_concert.jpg" width="100%"/>
                 <div style="position: absolute;
                             height: 200px;
                             width: 100%;
@@ -53,58 +53,62 @@
                     <h5>Price priority</h5>
                 </div>
                 <div class="col-lg-3">
-                    <input type="checkbox" checked data-toggle="toggle">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <div class="slider round"></div>
+                    </label>
                 </div>
 
                 <div class="col-lg-2">
                     <h5> Flex priority</h5>
                 </div>
                 <div class="col-lg-3">
-                    <input type="checkbox"  data-toggle="toggle">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <div class="slider round"></div>
+                    </label>
                 </div>
             </div>
             <hr class="yellow-hr bpad"/>
             <div class="row bpad">
 
                     <div class="col-lg-2">
-                        Fligth in
+                        Fligths total
                         <p><h4>${{ flight.price }}</h4></p>
 
                     </div>
                     <div class="col-lg-10">
                         <h4>
-                            Your JetBlue flight will leave <a href="url"><b>JFK at 14:00</b> and arrive in <b>SFO at 15:30</b></a>.
-                            And your return flight will leave <a href="url"><b>SFO at 12:00</b> and arrive in <b>JFK at 14:30</b></a>.
+                            Your JetBlue flight will leave <a href="url"><b>{{ flight.originDestinarions[0].departure.airportCode }} at {{ flight.originDestinarions[0].departure.time }}</b> and arrive in <b>{{ flight.originDestinarions[0].arrival.airportCode }} at {{ flight.originDestinarions[0].arrival.time }}</b></a>.
+                            And your return flight will leave <a href="url"><b>{{ flight.originDestinarions[0].arrival.airportCode }} at {{ flight.originDestinarions[0].arrival.time }}</b> and arrive in <b>{{ flight.originDestinarions[0].arrival.airportCode }} at {{ flight.originDestinarions[0].arrival.time }}</b></a>.
                         </h4>
                     </div>
+                <div class="col-lg-10">
+                    <h4>
+                        Your JetBlue flight will leave <a href="url"><b>{{ flight.originDestinarions[1].departure.airportCode }} at {{ flight.originDestinarions[1].departure.time }}</b> and arrive in <b>{{ flight.originDestinarions[1].arrival.airportCode }} at {{ flight.originDestinarions[1].arrival.time }}</b></a>.
+                    </h4>
+                </div>
 
             </div>
             <div class="row bpad">
-                    <div class="col-lg-2">
-                        Taxi and Hotel
-                        <p><h4>$140</h4></p>
+                    <div class="col-lg-1">
+                        Hotel
+                        <p><h4>${{ hotel.price }}</h4></p>
                     </div>
+                <div class="col-lg-1">
+                    Taxi
+                    <p><h4>${{ taxi.price }}</h4></p>
+                </div>
                     <div class="col-lg-10">
                         <h4>
-                            Uber will pick you up at <a href="url"><b>SFO at 15:45</b></a> to take you to the <a href="url"><b>Hilton***** hotel</b>
-                            where we booked a Presidential Suite for 3 nights</a>.
+                            Uber will pick you up at <a href="url"><b>{{ flight.originDestinarions[0].arrival.airportCode }} at ${{ taxi.pickupTime }}</b></a> to take you to the <a href="url"><b>{{ hotel.name }}{{ hotel.starts }}  hotel</b> for {{ hotel.nights }} nights</a>.
                         </h4>
                     </div>
 
             </div>
 
 
-            <div class="row bpad">
-                    <div class="col-lg-2">
-                        flight back
-                        <p><h4>$140</h4></p>
-                    </div>
-                    <div class="col-lg-10">
-                        <h4>
-                            Your JetBlue flight will leave <a href="url"><b>JFK at 14:00</b> and arrive in <b>SFO at 15:30</b></a>.
-                        </h4>
-                    </div>
-            </div>
+
 
 
         </div>

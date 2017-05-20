@@ -1,0 +1,125 @@
+    <div class="eventia-header">
+        <img src="img/header_background.jpg" width="100%"/>
+    </div>
+
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <p class="medium-text">You're going to</p>
+                <p class="large-text low-key-text">{{requestedEvent.title}}</p>
+            </div>
+        </div>
+
+        <div class="row horizontal-spacer-med"></div>
+
+        <div class="trip-controls">
+            <div class="row" class="border: 1px solid black; ">
+                <div class="col-lg-4">
+                    <span class="medium-text">Preferences</span>
+                </div>
+                <div class="col-lg-8 text-center medium-text">
+                    <div class="btn-group btn-group-lg" role="group" aria-label="...">
+                        <button type="button" class="btn btn-default" ng-click="toggleSummary()">{{otherViewLabel}}</button>
+                        <button type="button" class="btn btn-default" ng-click="toggleBiais()">{{biaisLabel}}</button>
+                        <button type="button" class="btn btn-default">More ...</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row horizontal-spacer-med">
+        </div>
+
+        <div class="trip-info" ng-show="showOverview">
+            <div id="chart-container">FusionCharts XT will load here!</div>
+        </div>
+
+        <div class="trip-info" ng-show="showSummary">
+            <div class="row" class="border: 1px solid black; ">
+                <div class="col-lg-4">
+                    <span class="medium-text">Trip Total</span>
+                </div>
+                <div class="col-lg-2">
+                    <span class="medium-text itin-info-color">$1,298</span>
+                </div>
+            </div>
+
+            <div class="row horizontal-spacer-med">
+            </div>
+
+            <div class="row" class="border: 1px solid black; ">
+                <div class="col-lg-4">
+                    <span class="medium-text">Flights</span>
+                </div>
+                <div class="col-lg-8">
+                    <span class="medium-text itin-info-color">$650</span>
+                </div>
+            </div>
+
+            <div class="row horizontal-spacer-small">
+            </div>
+
+            <div class="row">
+                <div class="trip-detail col-lg-9 col-lg-offset-2">
+                    <span class="medium-text">
+                        <p>Your JetBlue flight will leave <a href="url"><b>JFK at 14:00</b> and arrive in <b>SFO at 15:30</b></a></p>
+                        <p>And your return flight will leave <a href="url"><b>SFO at 12:00</b> and arrive in <b>JFK at 14:30</b></a>.</p>
+                    </span>
+                </div>
+            </div>
+
+            <div class="row horizontal-spacer-med">
+            </div>
+
+            <div class="row" class="border: 1px solid black; ">
+                <div class="col-lg-4">
+                    <span class="medium-text">Transport</span>
+                </div>
+                <div class="col-lg-8">
+                    <span class="medium-text itin-info-color">$25</span>
+                </div>
+            </div>
+
+            <div class="row horizontal-spacer-small">
+            </div>
+
+            <div class="row">
+                <div class="trip-detail col-lg-9 col-lg-offset-2">
+                    <span class="medium-text">
+                        Uber will pick you up at <a href="url"><b>SFO at 15:45</b></a>
+                    </span>
+                </div>
+            </div>
+
+            <div class="row horizontal-spacer-med">
+            </div>
+
+            <div class="row" class="border: 1px solid black; ">
+                <div class="col-lg-4">
+                    <span class="medium-text">Hotel</span>
+                </div>
+                <div class="col-lg-8">
+                    <span class="medium-text itin-info-color">$140</span>
+                </div>
+            </div>
+
+            <div class="row horizontal-spacer-small">
+            </div>
+
+            <div class="row">
+                <div class="trip-detail col-lg-9 col-lg-offset-2">
+                    <span class="medium-text">
+                        You will stay at the <a href="url"><b>Hilton hotel</b>
+                        where we booked a Presidential Suite for 3 nights</a>.
+                    </span>
+                </div>
+            </div>
+
+        </div>
+
+
+        </div>
+    </div>
+
