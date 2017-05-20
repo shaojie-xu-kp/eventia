@@ -1,11 +1,9 @@
 package com.datalex.eventia.service;
 
 import com.datalex.eventia.ApplicationProperties;
-import com.datalex.eventia.Exception.ApplicationException;
 import com.datalex.eventia.dto.predictHQ.Event;
 import com.datalex.eventia.dto.predictHQ.PredictHQResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;

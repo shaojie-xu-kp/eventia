@@ -1,4 +1,4 @@
-package com.datalex.eventia.Converter;
+package com.datalex.eventia.converter;
 
 /**
  * Created by shaojie.xu on 20/05/2017.

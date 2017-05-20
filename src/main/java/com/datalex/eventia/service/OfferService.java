@@ -1,7 +1,7 @@
 package com.datalex.eventia.service;
 
 import com.datalex.eventia.ApplicationProperties;
-import com.datalex.eventia.Converter.ConvertService;
+import com.datalex.eventia.converter.ConvertService;
 import com.datalex.eventia.domain.Coordinate;
 import com.datalex.eventia.domain.Offer;
 import com.datalex.eventia.dto.predictHQ.Event;
@@ -20,7 +20,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.StringJoiner;
-import java.util.TimeZone;
 
 /**
  * Created by shaojie.xu on 20/05/2017.

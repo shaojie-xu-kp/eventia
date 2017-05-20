@@ -17,7 +17,7 @@ public class OfferController {
 
     @RequestMapping(value = "/offer/{even_id}/{origin}", method = RequestMethod.GET)
     @ResponseStatus( HttpStatus.OK )
-    public Offer findOffer(@PathVariable( "origin" ) String origin, @PathVariable( "even_id" ) String eventId){
+    public Offer findOffer(@PathVariable( "origin" ) String origin, @PathVariable( "event_id" ) String eventId){
         return offerService.getBestOffer(origin, eventId);
     }
 }

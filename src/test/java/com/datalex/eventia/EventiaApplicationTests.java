@@ -112,6 +112,7 @@ public class EventiaApplicationTests {
 
         unmarshaller.marshal(flights, new StreamResult(System.out));
 
-        // TODO: adjust dates, filter airports, calculate distances (google), hotels (skyscanner), ground transport (uber, indigo)
+        // TODO: adjust dates, filter airports, hotels (skyscanner), ground transport (indigo)
+        // TODO: filter options so that flight arrives before the event starts
     }
 }
