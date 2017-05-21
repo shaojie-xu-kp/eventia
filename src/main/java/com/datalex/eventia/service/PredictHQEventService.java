@@ -42,7 +42,8 @@ public class PredictHQEventService implements EventService {
 
         String request = UriComponentsBuilder.fromHttpUrl(properties.getPredictHqUrl())
                 .queryParam("place.exact", city)
-                .queryParam("limit, 100")
+                .queryParam("limit", 100)
+                .queryParam("rank_level", "4,5")
                 .build()
                 .encode()
                 .toUriString();
