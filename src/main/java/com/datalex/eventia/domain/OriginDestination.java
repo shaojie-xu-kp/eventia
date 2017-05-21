@@ -10,4 +10,5 @@ import lombok.Setter;
 public class OriginDestination {
     private Departure departure;
     private Arrival arrival;
+    private String flightNumber;
 }

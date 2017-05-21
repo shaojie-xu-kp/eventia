@@ -28,11 +28,11 @@ public class PredictHQEventService implements EventService {
     private List<Event> preLoadedEvents;
 
     @PostConstruct
-    private void init(){
+    private void init() {
         preLoadedEvents = properties.getPreLoadedCities()
-                                    .stream()
-                                     .flatMap(city -> getEvents(city).stream())
-                                     .collect(Collectors.toList());
+                .stream()
+                .flatMap(city -> getEvents(city).stream())
+                .collect(Collectors.toList());
     }
 
     public List<Event> getEvents(String city) {
@@ -42,6 +42,7 @@ public class PredictHQEventService implements EventService {
 
         String request = UriComponentsBuilder.fromHttpUrl(properties.getPredictHqUrl())
                 .queryParam("place.exact", city)
+                .queryParam("limit, 100")
                 .build()
                 .encode()
                 .toUriString();

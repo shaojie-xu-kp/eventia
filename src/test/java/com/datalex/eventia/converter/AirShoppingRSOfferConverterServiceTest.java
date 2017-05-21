@@ -45,7 +45,7 @@ public class AirShoppingRSOfferConverterServiceTest {
     @Test
     public void test() throws Exception {
         AirShoppingRS rs = (AirShoppingRS) unmarshalObject("AirShoppingRS.xml");
-        Offer offer = airShoppingRSOfferConverterService.convert(rs);
+        Offer offer = airShoppingRSOfferConverterService.convert(rs, "JFK", "LAX");
         List<Flight> flights = offer.getFlights();
         System.out.println(flights.get(0));
     }

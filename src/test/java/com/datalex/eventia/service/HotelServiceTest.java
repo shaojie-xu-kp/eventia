@@ -21,6 +21,6 @@ public class HotelServiceTest {
 
     @Test
     public void testIndividuleId(){
-        hotelService.findHotels(eventService.getEventById("5doK6E4dLdEa"));
+        hotelService.findHotels(eventService.getEventById("aGRk63xmBebd"));
     }
 }

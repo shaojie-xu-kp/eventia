@@ -98,6 +98,10 @@ public class AirShoppingRSOfferConverterService {
         result.setDeparture(departure);
         result.setArrival(arrival);
 
+        MarketingCarrierFlightType marketingCarrier = destinationSegment.getMarketingCarrier();
+
+        result.setFlightNumber(marketingCarrier.getAirlineID().getValue() + marketingCarrier.getFlightNumber().getValue());
+
         return result;
     }
 }
