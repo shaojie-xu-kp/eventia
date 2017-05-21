@@ -96,7 +96,7 @@ public class EventiaApplicationTests {
         String lat = e.getLocation().get(1);
         Coordinate coordinate = new Coordinate(lon, lat);
         List<String> airports = airportLocatingService.localNearestAirports(coordinate);
-        AirShoppingRQ rq = (AirShoppingRQ) unmarshalObject("AirShoppingRQ.xml");
+        AirShoppingRQ rq = (AirShoppingRQ) unmarshalObject("request.xml");
         OriginDestination outbound = rq.getCoreQuery().getOriginDestinations().getOriginDestination().get(0);
         outbound.getDeparture().getAirportCode().setValue(origin);
         String airport = airports.get(0);

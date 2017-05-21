@@ -146,13 +146,13 @@ public class OfferService {
 
 
     public AirShoppingRQ getAirShoppingRQ(String origin, Event e, String airport) {
-        ZoneId zondIdDestinaion = ZoneId.of(e.getTimezone());
-        LocalDate eventStartLocalDate = e.getStart().toInstant().atZone(zondIdDestinaion).toLocalDate();
-        LocalDate eventEndLocalDate = e.getEnd().toInstant().atZone(zondIdDestinaion).toLocalDate();
+        ZoneId zonedIdDestination = ZoneId.of(e.getTimezone());
+        LocalDate eventStartLocalDate = e.getStart().toInstant().atZone(zonedIdDestination).toLocalDate();
+        LocalDate eventEndLocalDate = e.getEnd().toInstant().atZone(zonedIdDestination).toLocalDate();
 
         AirShoppingRQ rq = null;
         try {
-            rq = (AirShoppingRQ) unmarshalObject("AirShoppingRQ.xml");
+            rq = (AirShoppingRQ) unmarshalObject("request.xml");
         } catch (IOException e1) {
             e1.printStackTrace();
         }

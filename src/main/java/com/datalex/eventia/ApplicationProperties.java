@@ -11,7 +11,6 @@ import java.util.List;
 @Getter
 @Setter
 public class ApplicationProperties {
-
     private String host;
     private String predictHqAuthorizationKey;
     private String predictHqUrl;
@@ -29,5 +28,4 @@ public class ApplicationProperties {
     private String skyscannerEndDatePlaceHolder;
     private String skyscannerSessionApiPlaceHolder;
     private String skyscannerHotelIdPlaceHolder;
-
 }
