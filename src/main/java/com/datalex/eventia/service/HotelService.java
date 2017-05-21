@@ -105,10 +105,10 @@ public class HotelService {
         pullSessionResponse.setHotelsPrices(hotelPriceInfos);
 
         List<Hotel> hotels = new ArrayList<>();
-        int nightStay = (int)DAYS.between(eventStartLocalDate.minusDays(1), eventEndLocalDate.plusDays(1));
         List<HotelInfo> hotelInfos = new ArrayList<>();
         if(event.getCategory().equals("conferences"))
         {
+        int nightStay = (int)DAYS.between(eventStartLocalDate.minusDays(1), eventEndLocalDate.plusDays(1));
             hotelInfos = findExpensiveHotelInfo(pullSessionResponse);
             Collections.reverse(hotelPriceInfos);
 
@@ -126,12 +126,12 @@ public class HotelService {
                 hotel.setStars(hotelInfo.getStar_rating());
                 hotel.setPopularity(hotelInfo.getPopularity());
                 hotel.setPopularityDesc(hotelInfo.getPopularity_desc());
+                hotel.setNights(nightStay);
                 hotels.add(hotel);
 
             }
-
-
         }else{
+            int nightStay = (int)DAYS.between(eventStartLocalDate.minusDays(1), eventEndLocalDate.plusDays(2));
             Collections.sort(hotelPriceInfos);
             hotelInfos = findCheapHotelInfo(pullSessionResponse);
             for(HotelInfo hotelInfo : hotelInfos) {
@@ -147,6 +147,7 @@ public class HotelService {
                 hotel.setStars(hotelInfo.getStar_rating());
                 hotel.setPopularity(hotelInfo.getPopularity());
                 hotel.setPopularityDesc(hotelInfo.getPopularity_desc());
+                hotel.setNights(nightStay);
                 hotels.add(hotel);
             }
         }
