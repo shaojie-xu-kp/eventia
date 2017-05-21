@@ -25,7 +25,7 @@
        });
 
        eventiaApp.controller('searchController', function($filter, $scope, $http, $timeout, $anchorScroll, $rootScope,$location) {
-
+        $scope.processingRequest = true;
                // sample utility function
                function initScopeVars() {
                    // this code won't run until someone calls this function
@@ -33,7 +33,7 @@
                    $scope.testInputVal = "test1";
                    $scope.eventTitle = "";
                    $scope.eventSelectedFlag = false;
-                   $scope.searchCriteria = {origin: "BOS", travelerNbr: 1};
+                   $scope.searchCriteria = {origin: "ATL", travelerNbr: 1};
                    $scope.selected = "";
                    $scope.origin = "";
                }
@@ -157,13 +157,13 @@
                                     //$http.get("http://localhost:8085/offer")
                                                         .then(
                                                             function successCallback(response) {
-                                                             $('#loader').show();
+                                                            $scope.processingRequest = true;
                                                                 console.log("Offer received:");
                                                                 console.log(response.data);
                                                                $rootScope.offer=response.data;
                                                                $rootScope.offer.flights.sort($scope.sortFlightsByPrice);
                                                                console.log("loading...");
-                                                                $('#loader').hide();
+                                                               $scope.processingRequest = false;
                                                                 $location.path("/results");
                                                             },
                                                             function errorCallback(response) {
@@ -323,6 +323,11 @@
             $scope.flexBiais = false;
             $scope.biaisLabel = "Flex Biais";
             // note: this will have to be triggered when the results have been received from the server
+
+            $scope.selectFlight = function(flightIndex) {
+                $scope.flight = $scope.offer.flights[flightIndex];
+                 $rootScope.generateChart();
+            }
 
              $scope.selectFlexOptions = function() {
                 console.log("selectFlexOptions");
