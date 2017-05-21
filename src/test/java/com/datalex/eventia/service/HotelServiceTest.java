@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
+
 /**
  * Created by shaojie.xu on 20/05/2017.
  */
@@ -22,8 +24,8 @@ public class HotelServiceTest {
 
     @Test
     public void testIndividuleId(){
-        Hotel hotel = hotelService.findHotels(predictHQEventService.getEvents("JFK").get(4));
-        System.out.println(hotel);
+        List<Hotel> hotels = hotelService.findHotels(predictHQEventService.getEvents("JFK").get(4));
+        System.out.println(hotels);
     }
 
 }

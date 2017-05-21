@@ -26,9 +26,11 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -65,7 +67,8 @@ public class HotelService {
     }
 
 
-    public Hotel findHotels(Event event){
+    public List<Hotel> findHotels(Event event){
+        if(event == null) throw new IllegalArgumentException("Event not found");
         ZoneId zondIdDestinaion = ZoneId.of(event.getTimezone());
         LocalDate eventStartLocalDate = event.getStart().toInstant().atZone(zondIdDestinaion).toLocalDate();
         LocalDate eventEndLocalDate = event.getEnd().toInstant().atZone(zondIdDestinaion).toLocalDate();
@@ -101,58 +104,90 @@ public class HotelService {
         Collections.sort(hotelPriceInfos);
         pullSessionResponse.setHotelsPrices(hotelPriceInfos);
 
-        Hotel hotel = new Hotel();
-        hotel.setNights((int)DAYS.between(eventStartLocalDate.minusDays(1), eventEndLocalDate.plusDays(1)));
-        HotelInfo hotelInfo = null;
+        List<Hotel> hotels = new ArrayList<>();
+        int nightStay = (int)DAYS.between(eventStartLocalDate.minusDays(1), eventEndLocalDate.plusDays(1));
+        List<HotelInfo> hotelInfos = new ArrayList<>();
         if(event.getCategory().equals("conferences"))
         {
-            hotelInfo = findExpensiveHotelInfo(pullSessionResponse);
+            hotelInfos = findExpensiveHotelInfo(pullSessionResponse);
             Collections.reverse(hotelPriceInfos);
-            hotel.setPrice(hotelPriceInfos.stream()
-                                            .map(hotelPriceInfo1 -> hotelPriceInfo1.getAgentPrices())
-                                            .flatMap(agentPriceInfos -> agentPriceInfos.stream())
-                                            .map(agentPriceInfo -> agentPriceInfo.getPriceTotal())
-                                            .findFirst()
-                                            .orElse(879));
+
+            for(HotelInfo hotelInfo : hotelInfos)
+            {
+                Hotel hotel = new Hotel();
+                hotel.setPrice(hotelPriceInfos.stream()
+                        .filter(hotelPriceInfo -> hotelPriceInfo.getId().equals(hotelInfo.getHotel_id()))
+                        .map(hotelPriceInfo1 -> hotelPriceInfo1.getAgentPrices())
+                        .flatMap(agentPriceInfos -> agentPriceInfos.stream())
+                        .map(agentPriceInfo -> agentPriceInfo.getPriceTotal())
+                        .findFirst()
+                        .orElse(1098));
+                hotel.setName(hotelInfo.getName());
+                hotel.setStars(hotelInfo.getStar_rating());
+                hotel.setPopularity(hotelInfo.getPopularity());
+                hotel.setPopularityDesc(hotelInfo.getPopularity_desc());
+                hotels.add(hotel);
+
+            }
+
+
         }else{
             Collections.sort(hotelPriceInfos);
-            hotelInfo = findCheapHotelInfo(pullSessionResponse);
-            hotel.setPrice(hotelPriceInfos.stream()
-                            .map(hotelPriceInfo1 -> hotelPriceInfo1.getAgentPrices())
-                            .flatMap(agentPriceInfos -> agentPriceInfos.stream())
-                            .map(agentPriceInfo -> agentPriceInfo.getPriceTotal())
-                            .findFirst()
-                            .orElse(286));
+            hotelInfos = findCheapHotelInfo(pullSessionResponse);
+            for(HotelInfo hotelInfo : hotelInfos) {
+                Hotel hotel = new Hotel();
+                hotel.setPrice(hotelPriceInfos.stream()
+                        .filter(hotelPriceInfo -> hotelPriceInfo.getId().equals(hotelInfo.getHotel_id()))
+                        .map(hotelPriceInfo1 -> hotelPriceInfo1.getAgentPrices())
+                        .flatMap(agentPriceInfos -> agentPriceInfos.stream())
+                        .map(agentPriceInfo -> agentPriceInfo.getPriceTotal())
+                        .findFirst()
+                        .orElse(148));
+                hotel.setName(hotelInfo.getName());
+                hotel.setStars(hotelInfo.getStar_rating());
+                hotel.setPopularity(hotelInfo.getPopularity());
+                hotel.setPopularityDesc(hotelInfo.getPopularity_desc());
+                hotels.add(hotel);
+            }
         }
 
-        hotel.setName(hotelInfo.getName());
-        hotel.setStars(hotelInfo.getStar_rating());
-        hotel.setPopularity(hotelInfo.getPopularity());
-        hotel.setPopularityDesc(hotelInfo.getPopularity_desc());
 
-        return hotel;
+        return hotels;
     }
 
-    private HotelInfo findExpensiveHotelInfo(PullSessionResponse pullSessionResponse) {
+    private List<HotelInfo> findExpensiveHotelInfo(PullSessionResponse pullSessionResponse) {
         List<HotelPriceInfo> hotelPriceInfos = pullSessionResponse.getHotelsPrices();
+        Collections.reverse(hotelPriceInfos);
+        List<String> hotelIds = hotelPriceInfos.stream()
+                        .map(hotelPriceInfo -> hotelPriceInfo.getId())
+                        .limit(3)
+                        .collect(Collectors.toList());
+
         String hotelId = hotelPriceInfos.get(hotelPriceInfos.size()-1).getId();
-        HotelInfo hotelInfo = pullSessionResponse.getHotels()
+
+        List<HotelInfo> hotelInfos = pullSessionResponse.getHotels()
                                     .stream()
-                                    .filter(hotelInfo1 -> hotelInfo1.getHotel_id().equals(hotelId))
-                                    .findFirst()
-                                    .orElse(null);
-        return hotelInfo;
+                                    .filter(hotelInfo1 -> hotelIds.contains(hotelInfo1.getHotel_id()))
+                                    .collect(Collectors.toList());
+
+        return hotelInfos;
     }
 
-    private HotelInfo findCheapHotelInfo(PullSessionResponse pullSessionResponse) {
+    private List<HotelInfo> findCheapHotelInfo(PullSessionResponse pullSessionResponse) {
         List<HotelPriceInfo> hotelPriceInfos = pullSessionResponse.getHotelsPrices();
-        String hotelId = hotelPriceInfos.get(0).getId();
-        HotelInfo hotelInfo = pullSessionResponse.getHotels()
+        List<String> hotelIds = hotelPriceInfos.stream()
+                .map(hotelPriceInfo -> hotelPriceInfo.getId())
+                .limit(3)
+                .collect(Collectors.toList());
+
+        String hotelId = hotelPriceInfos.get(hotelPriceInfos.size()-1).getId();
+
+        List<HotelInfo> hotelInfos = pullSessionResponse.getHotels()
                 .stream()
-                .filter(hotelInfo1 -> hotelInfo1.getHotel_id().equals(hotelId))
-                .findFirst()
-                .orElse(null);
-        return hotelInfo;
+                .filter(hotelInfo1 -> hotelIds.contains(hotelInfo1.getHotel_id()))
+                .collect(Collectors.toList());
+
+        return hotelInfos;
     }
 
 

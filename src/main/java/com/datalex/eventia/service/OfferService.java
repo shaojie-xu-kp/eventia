@@ -83,11 +83,11 @@ public class OfferService {
         AirShoppingRQ rq = getAirShoppingRQ(origin, e, destination);
 
         AirShoppingRS flights = airShoppingService.findFlights(rq);
-        Hotel hotel = hotelService.findHotels(event);
+        List<Hotel> hotels = hotelService.findHotels(event);
 
         Offer offer = airShopingRSOfferConverterService.convert(flights, origin, destination);
         offer.setAncillaries(createDummyAncillaries());
-        offer.setHotels(Arrays.asList(hotel));
+        offer.setHotels(hotels);
         offer.setTaxis(createDummyTaxis());
         return offer;
     }
