@@ -5,19 +5,19 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 /**
  * Created by shaojie.xu on 20/05/2017.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@Setter
-@Getter
 public class Hotel {
 
     private String name;
     private String distanceToPlace;
     private String stars;
-    private double price;
+    private BigDecimal price;
     private int nights;
     private String roomStay;
     private String popularity;

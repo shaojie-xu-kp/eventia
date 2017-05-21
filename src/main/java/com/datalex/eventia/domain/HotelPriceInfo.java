@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 @Getter
 @Data
-public class HotelPriceInfo implements Comparable<HotelPriceInfo>{
+public class HotelPriceInfo implements Comparable<HotelPriceInfo> {
 
     private String id;
 
@@ -25,11 +25,11 @@ public class HotelPriceInfo implements Comparable<HotelPriceInfo>{
 
     @Override
     public int compareTo(HotelPriceInfo o) {
-        if(o !=null
-                && o.getAgentPrices()!=null
+        if (o != null
+                && o.getAgentPrices() != null
                 && o.getAgentPrices().get(0) != null
                 && this.getAgentPrices() != null
-                && this.getAgentPrices().get(0) !=null)
+                && this.getAgentPrices().get(0) != null)
             return this.getAgentPrices().get(0).compareTo(o.getAgentPrices().get(0));
         else
             return 1;

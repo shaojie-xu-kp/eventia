@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,7 +47,7 @@ public class IndigoService {
 
     private Taxi result2Taxi(Result result) {
         Taxi taxi = new Taxi();
-        taxi.setPrice(result.getCostTotal().substring(3));
+        taxi.setPrice(new BigDecimal(result.getCostTotal().substring(3)));
         taxi.setOperator(result.getOut().getOperator());
         return taxi;
     }

@@ -1,10 +1,7 @@
 package com.datalex.eventia.service;
 
 import com.datalex.eventia.ApplicationProperties;
-import com.datalex.eventia.domain.Hotel;
-import com.datalex.eventia.domain.HotelInfo;
-import com.datalex.eventia.domain.HotelPriceInfo;
-import com.datalex.eventia.domain.PullSessionResponse;
+import com.datalex.eventia.domain.*;
 import com.datalex.eventia.dto.predictHQ.Event;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,16 +17,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -59,7 +54,6 @@ public class HotelService {
     ObjectMapper mapper = new ObjectMapper();
 
 
-
     @PostConstruct
     private void init() {
         headers = new HttpHeaders();
@@ -67,8 +61,8 @@ public class HotelService {
     }
 
 
-    public List<Hotel> findHotels(Event event){
-        if(event == null) throw new IllegalArgumentException("Event not found");
+    public List<Hotel> findHotels(Event event) {
+        if (event == null) throw new IllegalArgumentException("Event not found");
         ZoneId zondIdDestinaion = ZoneId.of(event.getTimezone());
         LocalDate eventStartLocalDate = event.getStart().toInstant().atZone(zondIdDestinaion).toLocalDate();
         LocalDate eventEndLocalDate = event.getEnd().toInstant().atZone(zondIdDestinaion).toLocalDate();
@@ -78,8 +72,8 @@ public class HotelService {
         String createSessionrequest = UriComponentsBuilder
                 .fromHttpUrl(applicationProperties.getSkyscannerUrlBase()
                         + applicationProperties.getSkyscannerUrlCreateSession()
-                            .replace(applicationProperties.getSkyscannerStartDatePlaceHolder(), startDate)
-                            .replace(applicationProperties.getSkyscannerEndDatePlaceHolder(), endDate))
+                        .replace(applicationProperties.getSkyscannerStartDatePlaceHolder(), startDate)
+                        .replace(applicationProperties.getSkyscannerEndDatePlaceHolder(), endDate))
                 .build()
                 .encode()
                 .toUriString();
@@ -105,23 +99,21 @@ public class HotelService {
         pullSessionResponse.setHotelsPrices(hotelPriceInfos);
 
         List<Hotel> hotels = new ArrayList<>();
-        List<HotelInfo> hotelInfos = new ArrayList<>();
-        if(event.getCategory().equals("conferences"))
-        {
-        int nightStay = (int)DAYS.between(eventStartLocalDate.minusDays(1), eventEndLocalDate.plusDays(1));
+        List<HotelInfo> hotelInfos;
+        if (event.getCategory().equals("conferences")) {
+            int nightStay = (int) DAYS.between(eventStartLocalDate.minusDays(1), eventEndLocalDate.plusDays(1));
             hotelInfos = findExpensiveHotelInfo(pullSessionResponse);
             Collections.reverse(hotelPriceInfos);
 
-            for(HotelInfo hotelInfo : hotelInfos)
-            {
+            for (HotelInfo hotelInfo : hotelInfos) {
                 Hotel hotel = new Hotel();
                 hotel.setPrice(hotelPriceInfos.stream()
                         .filter(hotelPriceInfo -> hotelPriceInfo.getId().equals(hotelInfo.getHotel_id()))
-                        .map(hotelPriceInfo1 -> hotelPriceInfo1.getAgentPrices())
-                        .flatMap(agentPriceInfos -> agentPriceInfos.stream())
-                        .map(agentPriceInfo -> agentPriceInfo.getPriceTotal())
+                        .map(HotelPriceInfo::getAgentPrices)
+                        .flatMap(Collection::stream)
+                        .map(AgentPriceInfo::getPriceTotal)
                         .findFirst()
-                        .orElse(1098));
+                        .orElse(new BigDecimal("1098")));
                 hotel.setName(hotelInfo.getName());
                 hotel.setStars(hotelInfo.getStar_rating());
                 hotel.setPopularity(hotelInfo.getPopularity());
@@ -130,19 +122,19 @@ public class HotelService {
                 hotels.add(hotel);
 
             }
-        }else{
-            int nightStay = (int)DAYS.between(eventStartLocalDate.minusDays(1), eventEndLocalDate.plusDays(2));
+        } else {
+            int nightStay = (int) DAYS.between(eventStartLocalDate.minusDays(1), eventEndLocalDate.plusDays(2));
             Collections.sort(hotelPriceInfos);
             hotelInfos = findCheapHotelInfo(pullSessionResponse);
-            for(HotelInfo hotelInfo : hotelInfos) {
+            for (HotelInfo hotelInfo : hotelInfos) {
                 Hotel hotel = new Hotel();
                 hotel.setPrice(hotelPriceInfos.stream()
                         .filter(hotelPriceInfo -> hotelPriceInfo.getId().equals(hotelInfo.getHotel_id()))
-                        .map(hotelPriceInfo1 -> hotelPriceInfo1.getAgentPrices())
-                        .flatMap(agentPriceInfos -> agentPriceInfos.stream())
-                        .map(agentPriceInfo -> agentPriceInfo.getPriceTotal())
+                        .map(HotelPriceInfo::getAgentPrices)
+                        .flatMap(Collection::stream)
+                        .map(AgentPriceInfo::getPriceTotal)
                         .findFirst()
-                        .orElse(148));
+                        .orElse(new BigDecimal("148")));
                 hotel.setName(hotelInfo.getName());
                 hotel.setStars(hotelInfo.getStar_rating());
                 hotel.setPopularity(hotelInfo.getPopularity());
@@ -160,16 +152,16 @@ public class HotelService {
         List<HotelPriceInfo> hotelPriceInfos = pullSessionResponse.getHotelsPrices();
         Collections.reverse(hotelPriceInfos);
         List<String> hotelIds = hotelPriceInfos.stream()
-                        .map(hotelPriceInfo -> hotelPriceInfo.getId())
-                        .limit(3)
-                        .collect(Collectors.toList());
+                .map(HotelPriceInfo::getId)
+                .limit(3)
+                .collect(Collectors.toList());
 
-        String hotelId = hotelPriceInfos.get(hotelPriceInfos.size()-1).getId();
+        String hotelId = hotelPriceInfos.get(hotelPriceInfos.size() - 1).getId();
 
         List<HotelInfo> hotelInfos = pullSessionResponse.getHotels()
-                                    .stream()
-                                    .filter(hotelInfo1 -> hotelIds.contains(hotelInfo1.getHotel_id()))
-                                    .collect(Collectors.toList());
+                .stream()
+                .filter(hotelInfo1 -> hotelIds.contains(hotelInfo1.getHotel_id()))
+                .collect(Collectors.toList());
 
         return hotelInfos;
     }
@@ -177,11 +169,11 @@ public class HotelService {
     private List<HotelInfo> findCheapHotelInfo(PullSessionResponse pullSessionResponse) {
         List<HotelPriceInfo> hotelPriceInfos = pullSessionResponse.getHotelsPrices();
         List<String> hotelIds = hotelPriceInfos.stream()
-                .map(hotelPriceInfo -> hotelPriceInfo.getId())
+                .map(HotelPriceInfo::getId)
                 .limit(3)
                 .collect(Collectors.toList());
 
-        String hotelId = hotelPriceInfos.get(hotelPriceInfos.size()-1).getId();
+        String hotelId = hotelPriceInfos.get(hotelPriceInfos.size() - 1).getId();
 
         List<HotelInfo> hotelInfos = pullSessionResponse.getHotels()
                 .stream()
@@ -192,8 +184,7 @@ public class HotelService {
     }
 
 
-
-    private PullSessionResponse pullSessionDetails(String pullSessionRequest){
+    private PullSessionResponse pullSessionDetails(String pullSessionRequest) {
 
         PullSessionResponse pullSessionResponse = null;
         try {
@@ -213,7 +204,7 @@ public class HotelService {
 
             try {
                 Thread.sleep(1000);
-            } catch(InterruptedException ex) {
+            } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
 
@@ -237,10 +228,6 @@ public class HotelService {
         return pullSessionResponse;
 
     }
-
-
-
-
 
 
 }

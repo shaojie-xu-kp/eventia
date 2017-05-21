@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 /**
  * Created by shaojie.xu on 20/05/2017.
  */
@@ -14,7 +16,7 @@ import lombok.Setter;
 public class Taxi {
 
     private String pickupTime;
-    private String price;
+    private BigDecimal price;
     private String flightId;
     private String operator;
 

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
 
 /**
@@ -20,7 +21,7 @@ public class AgentPriceInfo implements Comparable<AgentPriceInfo>{
     private String  id;
 
     @JsonProperty("price_total")
-    private Integer priceTotal;
+    private BigDecimal priceTotal;
 
     @Override
     public int compareTo(AgentPriceInfo o) {

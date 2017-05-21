@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -115,29 +116,29 @@ public class OfferService {
         Taxi taxi = new Taxi();
         taxi.setFlightId("111");
         taxi.setPickupTime("14:00");
-        taxi.setPrice("10");
+        taxi.setPrice(new BigDecimal("10"));
         taxis.add(taxi);
         taxi = new Taxi();
         taxi.setFlightId("222");
         taxi.setPickupTime("17:00");
-        taxi.setPrice("15");
+        taxi.setPrice(new BigDecimal("15"));
         taxis.add(taxi);
         return taxis;
     }
 
     private List<Hotel> createDummyHotels() {
-        List<Hotel> hotels = new ArrayList<Hotel>();
+        List<Hotel> hotels = new ArrayList<>();
         Hotel hotel = new Hotel();
         hotel.setDistanceToPlace("1km");
         hotel.setNights(3);
-        hotel.setPrice(234);
+        hotel.setPrice(new BigDecimal("234"));
         hotel.setRoomStay("Double room");
         hotel.setStars("3");
         hotels.add(hotel);
         hotel = new Hotel();
         hotel.setDistanceToPlace("1km");
         hotel.setNights(3);
-        hotel.setPrice(483);
+        hotel.setPrice(new BigDecimal("483"));
         hotel.setRoomStay("Double room");
         hotel.setStars("4");
         hotel = new Hotel();
