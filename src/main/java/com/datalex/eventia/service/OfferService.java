@@ -50,6 +50,9 @@ public class OfferService {
     @Autowired
     private HotelService hotelService;
 
+    @Autowired
+    IndigoService indigoService;
+
 
     @Autowired
     private ResourceLoader resourceLoader;
@@ -86,9 +89,11 @@ public class OfferService {
         List<Hotel> hotels = hotelService.findHotels(event);
 
         Offer offer = airShopingRSOfferConverterService.convert(flights, origin, destination);
+        String date = offer.getFlights().get(0).getOriginDestinations().get(0).getArrival().getDate();
+        List<Taxi> taxis = indigoService.getTaxis("B624", date, "40.780593", "-73.98131");
         offer.setAncillaries(createDummyAncillaries());
         offer.setHotels(hotels);
-        offer.setTaxis(createDummyTaxis());
+        offer.setTaxis(taxis);
         return offer;
     }
 
