@@ -87,12 +87,12 @@ public class AirShoppingRSOfferConverterService {
         com.datalex.eventia.domain.OriginDestination result = new com.datalex.eventia.domain.OriginDestination();
         Departure departure = new Departure();
         departure.setAirportCode(originSegment.getDeparture().getAirportCode().getValue());
-        departure.setDate(originSegment.getDeparture().getDate().format(DateTimeFormatter.BASIC_ISO_DATE));
+        departure.setDate(originSegment.getDeparture().getDate().format(DateTimeFormatter.ISO_DATE));
         departure.setTime(originSegment.getDeparture().getFlightDepartureTime());
 
         Arrival arrival = new Arrival();
         arrival.setAirportCode(destinationSegment.getArrival().getAirportCode().getValue());
-        arrival.setDate(destinationSegment.getArrival().getDate().format(DateTimeFormatter.BASIC_ISO_DATE));
+        arrival.setDate(destinationSegment.getArrival().getDate().format(DateTimeFormatter.ISO_DATE));
         arrival.setTime(destinationSegment.getArrival().getFlightArrivalTime());
 
         result.setDeparture(departure);
