@@ -4,24 +4,24 @@
     left: 0px;
     background-color: red;
     width: 100%;
-    height: 250px;
+    height: 170px;
     overflow: hidden;
 }
 
 .large-text {
-    font-size: 5em;
-}
-
-.medium-text {
     font-size: 3em;
 }
 
-.normal-text {
+.medium-text {
     font-size: 2em;
 }
 
-.small-text {
+.normal-text {
     font-size: 1em;
+}
+
+.small-text {
+    font-size: .75em;
 }
 
 .itin-info-color {
@@ -34,17 +34,17 @@
 }
 
 .horizontal-spacer-large {
-    height: 100px;
+    height: 75px;
     background-color: none;
 }
 
 .horizontal-spacer-med {
-    height: 50px;
+    height: 30px;
     background-color: none;
 }
 
 .horizontal-spacer-small {
-    height: 25px;
+    height: 18px;
 }
 
 .trip-info {

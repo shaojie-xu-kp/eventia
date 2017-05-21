@@ -1,5 +1,5 @@
     <div class="eventia-header">
-        <img src="img/header_background.jpg" width="100%"/>
+        <img src="img/header_concert.jpg" width="100%"/>
     </div>
 
 
@@ -42,7 +42,7 @@
                     <span class="medium-text">Trip Total</span>
                 </div>
                 <div class="col-lg-2">
-                    <span class="medium-text itin-info-color">$1,298</span>
+                    <span class="medium-text itin-info-color"> ${{totalPrice}}</span>
                 </div>
             </div>
 
@@ -54,7 +54,7 @@
                     <span class="medium-text">Flights</span>
                 </div>
                 <div class="col-lg-8">
-                    <span class="medium-text itin-info-color">$650</span>
+                    <span class="medium-text itin-info-color">${{flight.price}}</span>
                 </div>
             </div>
 
@@ -64,8 +64,9 @@
             <div class="row">
                 <div class="trip-detail col-lg-9 col-lg-offset-2">
                     <span class="medium-text">
-                        <p>Your JetBlue flight will leave <a href="url"><b>JFK at 14:00</b> and arrive in <b>SFO at 15:30</b></a></p>
-                        <p>And your return flight will leave <a href="url"><b>SFO at 12:00</b> and arrive in <b>JFK at 14:30</b></a>.</p>
+                        <p>    Your JetBlue flight will leave <a href="url"><b>{{ flight.originDestinations[0].departure.airportCode }} at {{ flight.originDestinations[0].departure.time }}</b> and arrive in <b>{{ flight.originDestinations[0].arrival.airportCode }} at {{ flight.originDestinations[0].arrival.time }}</b></a>.</p>
+                        <p>   And your return flight will leave <a href="url"><b>{{ flight.originDestinations[0].arrival.airportCode }} at {{ flight.originDestinations[0].arrival.time }}</b> and arrive in <b>{{ flight.originDestinations[0].departure.airportCode }} at {{ flight.originDestinations[0].departure.time }}</b></a>.
+                        </p>
                     </span>
                 </div>
             </div>
@@ -78,7 +79,7 @@
                     <span class="medium-text">Transport</span>
                 </div>
                 <div class="col-lg-8">
-                    <span class="medium-text itin-info-color">$25</span>
+                    <span class="medium-text itin-info-color">${{ taxi.price }}</span>
                 </div>
             </div>
 
@@ -88,7 +89,7 @@
             <div class="row">
                 <div class="trip-detail col-lg-9 col-lg-offset-2">
                     <span class="medium-text">
-                        Uber will pick you up at <a href="url"><b>SFO at 15:45</b></a>
+                        Uber will pick you up at <a href="url"><b>{{ flight.originDestinations[0].arrival.airportCode }} at {{ taxi.pickupTime }}</b></a> to take you to the <b>{{ hotel.name }}{{ hotel.starts }}  hotel</b>
                     </span>
                 </div>
             </div>
@@ -101,7 +102,7 @@
                     <span class="medium-text">Hotel</span>
                 </div>
                 <div class="col-lg-8">
-                    <span class="medium-text itin-info-color">$140</span>
+                    <span class="medium-text itin-info-color">${{ hotel.price }}</span>
                 </div>
             </div>
 
@@ -111,8 +112,7 @@
             <div class="row">
                 <div class="trip-detail col-lg-9 col-lg-offset-2">
                     <span class="medium-text">
-                        You will stay at the <a href="url"><b>Hilton hotel</b>
-                        where we booked a Presidential Suite for 3 nights</a>.
+                        You will stay at the <a href="url"><b>{{ hotel.name }}{{ hotel.starts }}</b> for {{ hotel.nights }} nights</a>.
                     </span>
                 </div>
             </div>
