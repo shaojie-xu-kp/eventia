@@ -18,6 +18,10 @@ import java.util.List;
 public class PullSessionResponse {
 
     @JsonProperty("hotels_prices")
-    List<HotelPriceInfo> hotelsPrices;
+    private List<HotelPriceInfo> hotelsPrices;
+
+    private String status;
+
+    private List<HotelInfo> hotels;
 
 }

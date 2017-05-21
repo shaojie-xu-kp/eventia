@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Comparator;
+
 /**
  * Created by shaojie.xu on 20/05/2017.
  */
@@ -13,11 +15,18 @@ import lombok.Setter;
 @Setter
 @Getter
 @Data
-public class AgentPriceInfo {
+public class AgentPriceInfo implements Comparable<AgentPriceInfo>{
 
-          private String  id;
+    private String  id;
 
-            @JsonProperty("price_total")
-          private Integer priceTotal;
+    @JsonProperty("price_total")
+    private Integer priceTotal;
 
+    @Override
+    public int compareTo(AgentPriceInfo o) {
+        if(o != null )
+            return priceTotal.compareTo(o.getPriceTotal());
+        else
+            return 1;
+    }
 }

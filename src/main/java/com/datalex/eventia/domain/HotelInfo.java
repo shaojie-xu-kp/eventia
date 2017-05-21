@@ -6,20 +6,18 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Created by shaojie.xu on 20/05/2017.
+ * Created by shaojie.xu on 21/05/2017.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Data
 @Setter
 @Getter
-public class Hotel {
+@Data
+public class HotelInfo {
 
     private String name;
-    private String distanceToPlace;
-    private String stars;
-    private double price;
-    private int nights;
-    private String roomStay;
+    private String hotel_id;
     private String popularity;
-    private String popularityDesc;
+    private String popularity_desc;
+    private String star_rating;
+
 }

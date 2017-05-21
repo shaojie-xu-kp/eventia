@@ -1,5 +1,6 @@
 package com.datalex.eventia.service;
 
+import com.datalex.eventia.domain.Hotel;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,12 @@ public class HotelServiceTest {
     HotelService hotelService;
 
     @Autowired
-    EventService eventService;
+    EventService predictHQEventService;
 
     @Test
     public void testIndividuleId(){
-        hotelService.findHotels(eventService.getEventById("5doK6E4dLdEa"));
+        Hotel hotel = hotelService.findHotels(predictHQEventService.getEvents("JFK").get(4));
+        System.out.println(hotel);
     }
+
 }

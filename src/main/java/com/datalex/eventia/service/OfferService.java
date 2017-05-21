@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -45,6 +46,9 @@ public class OfferService {
     @Autowired
     private ApplicationProperties properties;
 
+    @Autowired
+    private HotelService hotelService;
+
 
     @Autowired
     private ResourceLoader resourceLoader;
@@ -66,11 +70,19 @@ public class OfferService {
 
     public Offer getBestOffer(String origin, String eventId){
 
-        AirShoppingRQ rq = getAirShoppingRQ(origin, eventId);
+        Event event = predictHQEventService.getEventById(eventId);
+
+        if(event == null)
+        {
+            throw new IllegalArgumentException("Event not found : " + eventId);
+        }
+
+        AirShoppingRQ rq = getAirShoppingRQ(origin, event);
 
         AirShoppingRS flights = airShoppingService.findFlights(rq);
         Offer offer = airShopingRSOfferConverterService.convert(flights);
-        offer.setHotels(createDummyHotels());
+        Hotel hotel = hotelService.findHotels(event);
+        offer.setHotels(Arrays.asList(hotel));
         offer.setTaxis(createDummyTaxis());
         offer.setAncillaries(createDummyAncillaries());
         return offer;
@@ -108,15 +120,15 @@ public class OfferService {
         List<Hotel> hotels = new ArrayList<Hotel>();
         Hotel hotel = new Hotel();
         hotel.setDistanceToPlace("1km");
-        hotel.setNights("3");
-        hotel.setPrice("300");
+        hotel.setNights(3);
+        hotel.setPrice(234);
         hotel.setRoomStay("Double room");
         hotel.setStars("3");
         hotels.add(hotel);
         hotel = new Hotel();
         hotel.setDistanceToPlace("1km");
-        hotel.setNights("3");
-        hotel.setPrice("500");
+        hotel.setNights(3);
+        hotel.setPrice(483);
         hotel.setRoomStay("Double room");
         hotel.setStars("4");
         hotel = new Hotel();
@@ -124,8 +136,7 @@ public class OfferService {
     }
 
 
-    public AirShoppingRQ getAirShoppingRQ(String origin, String eventId) {
-        Event e = predictHQEventService.getEventById(eventId);
+    public AirShoppingRQ getAirShoppingRQ(String origin, Event e) {
         ZoneId zondIdDestinaion = ZoneId.of(e.getTimezone());
         LocalDate eventStartLocalDate = e.getStart().toInstant().atZone(zondIdDestinaion).toLocalDate();
         LocalDate eventEndLocalDate = e.getEnd().toInstant().atZone(zondIdDestinaion).toLocalDate();
