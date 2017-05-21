@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -46,6 +47,9 @@ public class OfferService {
     @Autowired
     private ApplicationProperties properties;
 
+    @Autowired
+    private HotelService hotelService;
+
 
     @Autowired
     private ResourceLoader resourceLoader;
@@ -65,16 +69,25 @@ public class OfferService {
         return joiner.add("classpath").add(fileName).toString();
     }
 
-    public Offer getBestOffer(String origin, String eventId) {
+    public Offer getBestOffer(String origin, String eventId){
+
+        Event event = predictHQEventService.getEventById(eventId);
+
+        if(event == null)
+        {
+            throw new IllegalArgumentException("Event not found : " + eventId);
+        }
+
         Event e = predictHQEventService.getEventById(eventId);
         String destination = findClosestJetBlueAirport(e);
         AirShoppingRQ rq = getAirShoppingRQ(origin, e, destination);
 
         AirShoppingRS flights = airShoppingService.findFlights(rq);
+        List<Hotel> hotels = hotelService.findHotels(event);
 
         Offer offer = airShopingRSOfferConverterService.convert(flights, origin, destination);
         offer.setAncillaries(createDummyAncillaries());
-        offer.setHotels(createDummyHotels());
+        offer.setHotels(hotels);
         offer.setTaxis(createDummyTaxis());
         return offer;
     }
@@ -108,23 +121,21 @@ public class OfferService {
     }
 
     private List<Hotel> createDummyHotels() {
-        List<Hotel> hotels = new ArrayList<>();
+        List<Hotel> hotels = new ArrayList<Hotel>();
         Hotel hotel = new Hotel();
-        hotel.setName("Riu");
         hotel.setDistanceToPlace("1km");
-        hotel.setNights("3");
-        hotel.setPrice("300");
+        hotel.setNights(3);
+        hotel.setPrice(234);
         hotel.setRoomStay("Double room");
         hotel.setStars("3");
         hotels.add(hotel);
         hotel = new Hotel();
-        hotel.setName("Benetton");
         hotel.setDistanceToPlace("1km");
-        hotel.setNights("3");
-        hotel.setPrice("500");
+        hotel.setNights(3);
+        hotel.setPrice(483);
         hotel.setRoomStay("Double room");
         hotel.setStars("4");
-        hotels.add(hotel);
+        hotel = new Hotel();
         return hotels;
     }
 
@@ -167,7 +178,7 @@ public class OfferService {
     }
 
 
-    public static void main(String... args) {
+    public static void main(String... args){
 
         ZoneId id1 = ZoneId.of("America/New_York");
         System.out.println(id1);

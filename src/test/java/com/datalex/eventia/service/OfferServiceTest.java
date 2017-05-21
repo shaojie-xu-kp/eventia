@@ -18,18 +18,16 @@ public class OfferServiceTest {
     @Autowired
     OfferService offerService;
 
-//    @Test
-//    public void testAirShoppingRQ()
-//    {
-//        AirShoppingRQ rq =  offerService.getAirShoppingRQ("BOS", "LxG6KlaYNNVA");
-//        // assert something
-//    }
-//
-//
-//    @Test
-//    public void testOffer(){
-//        Offer rs = offerService.getBestOffer("BOS", "LxG6KlaYNNVA");
-//        // assert something
-//    }
+    @Autowired
+    EventService eventService;
+
+
+    @Test
+    public void testOffer(){
+        String eventId = eventService.getPreLoadedEvents().get(4).getId();
+        Offer rs = offerService.getBestOffer("BOS", eventId);
+        System.out.println(rs);
+        // assert something
+    }
 
 }

@@ -2,10 +2,17 @@ package com.datalex.eventia.service;
 
 import com.datalex.eventia.ApplicationProperties;
 import com.datalex.eventia.domain.Hotel;
+import com.datalex.eventia.domain.HotelInfo;
+import com.datalex.eventia.domain.HotelPriceInfo;
 import com.datalex.eventia.domain.PullSessionResponse;
 import com.datalex.eventia.dto.predictHQ.Event;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -19,8 +26,13 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.time.temporal.ChronoUnit.DAYS;
 
 /**
  * Created by shaojie.xu on 20/05/2017.
@@ -34,6 +46,9 @@ public class HotelService {
 
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     private HttpHeaders headers;
 
     private static final String QUERY = "?";
@@ -41,16 +56,19 @@ public class HotelService {
     @Autowired
     ApplicationProperties applicationProperties;
 
+    ObjectMapper mapper = new ObjectMapper();
+
+
 
     @PostConstruct
     private void init() {
         headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        headers.set("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
     }
 
 
     public List<Hotel> findHotels(Event event){
+        if(event == null) throw new IllegalArgumentException("Event not found");
         ZoneId zondIdDestinaion = ZoneId.of(event.getTimezone());
         LocalDate eventStartLocalDate = event.getStart().toInstant().atZone(zondIdDestinaion).toLocalDate();
         LocalDate eventEndLocalDate = event.getEnd().toInstant().atZone(zondIdDestinaion).toLocalDate();
@@ -65,6 +83,7 @@ public class HotelService {
                 .build()
                 .encode()
                 .toUriString();
+        System.out.println(createSessionrequest);
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
         HttpEntity<String> createSessionResponseEntity = restTemplate.exchange(createSessionrequest, HttpMethod.GET, entity, String.class);
@@ -79,37 +98,106 @@ public class HotelService {
                 .build()
                 .encode()
                 .toUriString();
-        System.out.println(pullSessionRequest);
-        restTemplate.getForEntity(pullSessionRequest, String.class);
 
-//        HttpEntity<String> pullSessionResponseEntity = restTemplate.exchange(pullSessionRequest, HttpMethod.GET, entity, String.class);
+        PullSessionResponse pullSessionResponse = pullSessionDetails(pullSessionRequest);
+        List<HotelPriceInfo> hotelPriceInfos = pullSessionResponse.getHotelsPrices();
+        Collections.sort(hotelPriceInfos);
+        pullSessionResponse.setHotelsPrices(hotelPriceInfos);
 
-//        ResponseEntity<PullSessionResponse> pullSessionResponseEntity = restTemplate.exchange(pullSessionRequest, HttpMethod.GET, entity, PullSessionResponse.class);
+        List<Hotel> hotels = new ArrayList<>();
+        int nightStay = (int)DAYS.between(eventStartLocalDate.minusDays(1), eventEndLocalDate.plusDays(1));
+        List<HotelInfo> hotelInfos = new ArrayList<>();
+        if(event.getCategory().equals("conferences"))
+        {
+            hotelInfos = findExpensiveHotelInfo(pullSessionResponse);
+            Collections.reverse(hotelPriceInfos);
 
-//        pullSessionResponseEntity.getBody().getHotelsPrices()
-//                                            .stream()
-//                                            .forEach(hotelPriceInfo -> System.out.println(hotelPriceInfo.getId()));
+            for(HotelInfo hotelInfo : hotelInfos)
+            {
+                Hotel hotel = new Hotel();
+                hotel.setPrice(hotelPriceInfos.stream()
+                        .filter(hotelPriceInfo -> hotelPriceInfo.getId().equals(hotelInfo.getHotel_id()))
+                        .map(hotelPriceInfo1 -> hotelPriceInfo1.getAgentPrices())
+                        .flatMap(agentPriceInfos -> agentPriceInfos.stream())
+                        .map(agentPriceInfo -> agentPriceInfo.getPriceTotal())
+                        .findFirst()
+                        .orElse(1098));
+                hotel.setName(hotelInfo.getName());
+                hotel.setStars(hotelInfo.getStar_rating());
+                hotel.setPopularity(hotelInfo.getPopularity());
+                hotel.setPopularityDesc(hotelInfo.getPopularity_desc());
+                hotels.add(hotel);
 
-        return null;
+            }
+
+
+        }else{
+            Collections.sort(hotelPriceInfos);
+            hotelInfos = findCheapHotelInfo(pullSessionResponse);
+            for(HotelInfo hotelInfo : hotelInfos) {
+                Hotel hotel = new Hotel();
+                hotel.setPrice(hotelPriceInfos.stream()
+                        .filter(hotelPriceInfo -> hotelPriceInfo.getId().equals(hotelInfo.getHotel_id()))
+                        .map(hotelPriceInfo1 -> hotelPriceInfo1.getAgentPrices())
+                        .flatMap(agentPriceInfos -> agentPriceInfos.stream())
+                        .map(agentPriceInfo -> agentPriceInfo.getPriceTotal())
+                        .findFirst()
+                        .orElse(148));
+                hotel.setName(hotelInfo.getName());
+                hotel.setStars(hotelInfo.getStar_rating());
+                hotel.setPopularity(hotelInfo.getPopularity());
+                hotel.setPopularityDesc(hotelInfo.getPopularity_desc());
+                hotels.add(hotel);
+            }
+        }
+
+
+        return hotels;
     }
 
-    public static void main(String... args){
+    private List<HotelInfo> findExpensiveHotelInfo(PullSessionResponse pullSessionResponse) {
+        List<HotelPriceInfo> hotelPriceInfos = pullSessionResponse.getHotelsPrices();
+        Collections.reverse(hotelPriceInfos);
+        List<String> hotelIds = hotelPriceInfos.stream()
+                        .map(hotelPriceInfo -> hotelPriceInfo.getId())
+                        .limit(3)
+                        .collect(Collectors.toList());
 
-//        HttpClient client = HttpClientBuilder.create().build();
-//        HttpGet request = new HttpGet(url);
-//
-//        // add request header
-//        request.addHeader("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
-//        try {
-//            HttpResponse response = client.execute(request);
-//            System.out.println(response.toString());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        String hotelId = hotelPriceInfos.get(hotelPriceInfos.size()-1).getId();
 
+        List<HotelInfo> hotelInfos = pullSessionResponse.getHotels()
+                                    .stream()
+                                    .filter(hotelInfo1 -> hotelIds.contains(hotelInfo1.getHotel_id()))
+                                    .collect(Collectors.toList());
+
+        return hotelInfos;
+    }
+
+    private List<HotelInfo> findCheapHotelInfo(PullSessionResponse pullSessionResponse) {
+        List<HotelPriceInfo> hotelPriceInfos = pullSessionResponse.getHotelsPrices();
+        List<String> hotelIds = hotelPriceInfos.stream()
+                .map(hotelPriceInfo -> hotelPriceInfo.getId())
+                .limit(3)
+                .collect(Collectors.toList());
+
+        String hotelId = hotelPriceInfos.get(hotelPriceInfos.size()-1).getId();
+
+        List<HotelInfo> hotelInfos = pullSessionResponse.getHotels()
+                .stream()
+                .filter(hotelInfo1 -> hotelIds.contains(hotelInfo1.getHotel_id()))
+                .collect(Collectors.toList());
+
+        return hotelInfos;
+    }
+
+
+
+    private PullSessionResponse pullSessionDetails(String pullSessionRequest){
+
+        PullSessionResponse pullSessionResponse = null;
         try {
-            URL url = new URL("http://partners.api.skyscanner.net/apiservices/hotels/liveprices/v2/H4sIAAAAAAAEAKtWyleyilYKDVbSUUrN0wXTocEuQNLI3NTY3NTECMQ0MDTXNQAikxADAyswQhI1NEASNQRCJUNjHSMjHUNTQyWdvNKcnFgdpTwlK11DY6COWgCuSmd2cQAAAA2?apikey=_HvyLQUibSmiFspnQ-Mf1E2v6Ok9z7p9tJrTM628vwS1p8K4kmwbazKVmHjFe4-rCFxn_oEsTRfR0Tz-5DJGXAA%3D%3D");
 
+            URL url = new URL(pullSessionRequest);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json");
@@ -119,20 +207,38 @@ public class HotelService {
                         + conn.getResponseCode());
             }
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(
+            new BufferedReader(new InputStreamReader(
                     (conn.getInputStream())));
 
-            String output;
-            System.out.println("Output from Server .... \n");
-            while ((output = br.readLine()) != null) {
-                System.out.println(output);
+            try {
+                Thread.sleep(1000);
+            } catch(InterruptedException ex) {
+                Thread.currentThread().interrupt();
             }
+
+            BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+
+            StringBuilder builder = new StringBuilder();
+            String response = "";
+
+            while ((response = br.readLine()) != null) {
+                builder.append(response);
+            }
+
+            String text = builder.toString();
+            System.out.println(text);
+            pullSessionResponse = objectMapper.readValue(text, PullSessionResponse.class);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        return pullSessionResponse;
 
     }
+
+
+
 
 
 
