@@ -14,7 +14,7 @@
 
                // route for the about page
                .when('/results', {
-                   templateUrl : 'app/results.html',
+                   templateUrl : 'app/results_dom.html',
                    controller  : 'resultController'
                })
        });
@@ -25,7 +25,7 @@
        });
 
        eventiaApp.controller('searchController', function($filter, $scope, $http, $timeout, $anchorScroll, $rootScope,$location) {
-
+        $scope.processingRequest = true;
                // sample utility function
                function initScopeVars() {
                    // this code won't run until someone calls this function
@@ -33,7 +33,7 @@
                    $scope.testInputVal = "test1";
                    $scope.eventTitle = "";
                    $scope.eventSelectedFlag = false;
-                   $scope.searchCriteria = {origin: "BOS", travelerNbr: 1};
+                   $scope.searchCriteria = {origin: "ATL", travelerNbr: 1};
                    $scope.selected = "";
                    $scope.origin = "";
                }
@@ -151,18 +151,19 @@
        //            alert("2");
                }
                 function getOffer(eventId,origin){
-                                       // $http.get("http://localhost:8080/offer/"+eventId+"/"+origin)
+                                        $http.get("http://localhost:8080/offer/"+eventId+"/"+origin)
 
 
-                                    $http.get("http://localhost:8085/offer")
+                                    //$http.get("http://localhost:8085/offer")
                                                         .then(
                                                             function successCallback(response) {
-                                                             $('#loader').show();
+                                                            $scope.processingRequest = true;
                                                                 console.log("Offer received:");
                                                                 console.log(response.data);
                                                                $rootScope.offer=response.data;
+                                                               $rootScope.offer.flights.sort($scope.sortFlightsByPrice);
                                                                console.log("loading...");
-                                                                $('#loader').hide();
+                                                               $scope.processingRequest = false;
                                                                 $location.path("/results");
                                                             },
                                                             function errorCallback(response) {
@@ -173,6 +174,14 @@
                                         }
                $scope.selectEvent = function() {
                    $scope.eventSelected = true;
+               }
+
+               $scope.sortFlightsByPrice = function(flight1, flight2) {
+                    if (flight1.price > flight2.price) {
+                            return 1;
+                        } else {
+                            return -1;
+                        }
                }
 
                $scope.mySelectMatch = function(myIndex) {
@@ -222,8 +231,10 @@
                 $scope.flexBiais= !$scope.flexBiais;
                 if ($scope.priceBiais) {
                     $scope.biaisLabel = "Flex Biais";
+                    selectOfferData($scope.offer);
                 } else {
                     $scope.biaisLabel = "Price Biais";
+                    $scope.selectFlexOptions();
                 }
             }
 
@@ -235,7 +246,7 @@
                     type: 'doughnut2d',
                     renderAt: 'chart-container',
                     width: '100%',
-                    height: '1000',
+                    height: '600',
                     dataFormat: 'json',
                     dataSource: {
                         "chart": {
@@ -268,7 +279,7 @@
                             "showLabels": "0",
                             "showPercentValues": "1",
                             "showLegend": "1",
-                            "defaultCenterLabel": "Total: $1,280",
+                            "defaultCenterLabel": "Total: " + $scope.totalPrice,
                             "centerLabel": "$label: $value",
                             "centerLabelBold": "1",
                             "showTooltip": "0",
@@ -278,15 +289,15 @@
                         },
                         "data": [{
                             "label": "Air",
-                            "value": "780"
+                            "value": $scope.flight.price
                             }, {
                             "label": "Taxi",
-                            "value": "50"
+                            "value": $scope.taxi.price
                             }, {
                             "label": "Hotel",
-                            "value": "347"
+                            "value": $scope.hotel.price
                             }, {
-                            "label": "Golf",
+                            "label": "Ancillaries",
                             "value": "120"
                             }
                         ]
@@ -312,14 +323,35 @@
             $scope.flexBiais = false;
             $scope.biaisLabel = "Flex Biais";
             // note: this will have to be triggered when the results have been received from the server
-             $rootScope.generateChart();
+
+            $scope.selectFlight = function(flightIndex) {
+                $scope.flight = $scope.offer.flights[flightIndex];
+                 $rootScope.generateChart();
+            }
+
+             $scope.selectFlexOptions = function() {
+                console.log("selectFlexOptions");
+                $scope.flight = $scope.offer.flights[$scope.offer.flights.length -1];
+                $scope.hotel = $scope.offer.hotels[$scope.offer.hotels.length -1];
+                $scope.taxi = $scope.offer.taxis[$scope.offer.taxis.length -1];
+                 $rootScope.generateChart();
+
+             }
 
 
                       function selectOfferData(response){
                                           $scope.flight= response.flights[0];
+                                          console.log("flight:");
+                                          console.log($scope.flight);
+                                          console.log("flights:");
+                                          console.log(response.flights);
                                           $scope.hotel= response.hotels[0];
                                           $scope.ancillaries= response.ancillaries[0];
                                           $scope.taxi= response.taxis[0];
+                                          var total = 0;
+                                          total = $scope.flight.price +  $scope.hotel.price +$scope.taxi.price;
+                                          $scope.totalPrice= total;
+                                           $rootScope.generateChart();
                                      }
 
 

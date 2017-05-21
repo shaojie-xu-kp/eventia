@@ -110,6 +110,7 @@ public class OfferService {
     private List<Hotel> createDummyHotels() {
         List<Hotel> hotels = new ArrayList<>();
         Hotel hotel = new Hotel();
+        hotel.setName("Riu");
         hotel.setDistanceToPlace("1km");
         hotel.setNights("3");
         hotel.setPrice("300");
@@ -117,12 +118,13 @@ public class OfferService {
         hotel.setStars("3");
         hotels.add(hotel);
         hotel = new Hotel();
+        hotel.setName("Benetton");
         hotel.setDistanceToPlace("1km");
         hotel.setNights("3");
         hotel.setPrice("500");
         hotel.setRoomStay("Double room");
         hotel.setStars("4");
-        hotel = new Hotel();
+        hotels.add(hotel);
         return hotels;
     }
 
