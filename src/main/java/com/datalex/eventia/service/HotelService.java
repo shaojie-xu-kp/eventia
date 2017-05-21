@@ -82,7 +82,7 @@ public class HotelService {
                 .toUriString();
         System.out.println(createSessionrequest);
 
-        HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
         HttpEntity<String> createSessionResponseEntity = restTemplate.exchange(createSessionrequest, HttpMethod.GET, entity, String.class);
         HttpHeaders responseEntityHeaders = createSessionResponseEntity.getHeaders();
         URI location = responseEntityHeaders.getLocation();

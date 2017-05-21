@@ -14,7 +14,7 @@
 
                // route for the about page
                .when('/results', {
-                   templateUrl : 'app/results.html',
+                   templateUrl : 'app/results_dom.html',
                    controller  : 'resultController'
                })
        });
@@ -25,7 +25,7 @@
        });
 
        eventiaApp.controller('searchController', function($filter, $scope, $http, $timeout, $anchorScroll, $rootScope,$location) {
-
+        $scope.processingRequest = true;
                // sample utility function
                function initScopeVars() {
                    // this code won't run until someone calls this function
@@ -33,7 +33,7 @@
                    $scope.testInputVal = "test1";
                    $scope.eventTitle = "";
                    $scope.eventSelectedFlag = false;
-                   $scope.searchCriteria = {origin: "BOS", travelerNbr: 1};
+                   $scope.searchCriteria = {origin: "ATL", travelerNbr: 1};
                    $scope.selected = "";
                    $scope.origin = "";
                }
@@ -150,9 +150,38 @@
                    }
        //            alert("2");
                }
+                function getOffer(eventId,origin){
+                                        $http.get("http://localhost:8080/offer/"+eventId+"/"+origin)
 
+
+                                    //$http.get("http://localhost:8085/offer")
+                                                        .then(
+                                                            function successCallback(response) {
+                                                            $scope.processingRequest = true;
+                                                                console.log("Offer received:");
+                                                                console.log(response.data);
+                                                               $rootScope.offer=response.data;
+                                                               $rootScope.offer.flights.sort($scope.sortFlightsByPrice);
+                                                               console.log("loading...");
+                                                               $scope.processingRequest = false;
+                                                                $location.path("/results");
+                                                            },
+                                                            function errorCallback(response) {
+                                                                console.log("Unable to get event"+response);
+                                                                $scope.errorMessage = "Unable to get event";
+                                                            });
+
+                                        }
                $scope.selectEvent = function() {
                    $scope.eventSelected = true;
+               }
+
+               $scope.sortFlightsByPrice = function(flight1, flight2) {
+                    if (flight1.price > flight2.price) {
+                            return 1;
+                        } else {
+                            return -1;
+                        }
                }
 
                $scope.mySelectMatch = function(myIndex) {
@@ -170,9 +199,9 @@
 
                 $scope.goToResults = function() {
                                console.log("goToResults()");
-                                 $location.path("/results");
                                  $rootScope.sampleValue = "something";
                                  $rootScope.searchCriteria = $scope.searchCriteria;
+                                  getOffer($scope.searchCriteria.id,$scope.searchCriteria.origin);
                            }
            });
 
@@ -182,43 +211,151 @@
 
        eventiaApp.controller('resultController', function($rootScope, $scope, $http, $timeout,  $location)  {
 
+            // Dominique - moved init to the end of the controller definition
+            // (so that all dependent functions have been defined)
+
+            // Dominique
+            $scope.toggleSummary = function() {
+                $scope.showSummary = !$scope.showSummary;
+                $scope.showOverview = !$scope.showOverview;
+                if ($scope.showSummary) {
+                    $scope.otherViewLabel = "Overview";
+                } else {
+                    $scope.otherViewLabel = "Summary";
+                }
+            }
+
+            $scope.toggleBiais = function() {
+                console.log("toggleBiais()");
+                $scope.priceBiais = !$scope.priceBiais;
+                $scope.flexBiais= !$scope.flexBiais;
+                if ($scope.priceBiais) {
+                    $scope.biaisLabel = "Flex Biais";
+                    selectOfferData($scope.offer);
+                } else {
+                    $scope.biaisLabel = "Price Biais";
+                    $scope.selectFlexOptions();
+                }
+            }
+
+            // Fusion Charts
+
+            $rootScope.generateChart = function() {
+                console.log("initializing fusion charts ...");
+                var fusioncharts = new FusionCharts({
+                    type: 'doughnut2d',
+                    renderAt: 'chart-container',
+                    width: '100%',
+                    height: '600',
+                    dataFormat: 'json',
+                    dataSource: {
+                        "chart": {
+                            "caption": "Your Itinerary",
+                            "subCaption": "Selected by Eventia Smart Engine",
+                            // caption cosmetics
+                            "captionFont": "Arial",
+                            "captionFontSize": "36",
+                            "captionFontColor": "#AAAAAA",
+                            "captionFontBold": "1",
+                            "subcaptionFont": "Arial",
+                            "subcaptionFontSize": "24",
+                            "subcaptionFontColor": "#AAAAAA",
+                            "subcaptionFontBold": "0",
+                            // end caption cosmetics
+                            // label cosmetics
+                            "labelFont": "Arial",
+                            "labelFontColor": "000080",
+                            "labelFontSize": "36",
+                            //        "labelBorderColor": "000000",
+                            //        "labelBorderPadding": "5",
+                            //        "labelBorderRadius": "2",
+                            //        "labelBorderDashed": "1",
+                            // end label cosmetics
+                            "numberPrefix": "$",
+                            "showBorder": "0",
+                            "use3DLighting": "0",
+                            "enableSmartLabels": "0",
+                            "startingAngle": "310",
+                            "showLabels": "0",
+                            "showPercentValues": "1",
+                            "showLegend": "1",
+                            "defaultCenterLabel": "Total: " + $scope.totalPrice,
+                            "centerLabel": "$label: $value",
+                            "centerLabelBold": "1",
+                            "showTooltip": "0",
+                            "decimals": "0",
+                            "useDataPlotColorForLabels": "1",
+                            "theme": "fint"
+                        },
+                        "data": [{
+                            "label": "Air",
+                            "value": $scope.flight.price
+                            }, {
+                            "label": "Taxi",
+                            "value": $scope.taxi.price
+                            }, {
+                            "label": "Hotel",
+                            "value": $scope.hotel.price
+                            }, {
+                            "label": "Ancillaries",
+                            "value": "120"
+                            }
+                        ]
+                    }
+                });
+                console.log("ready to render ...");
+
+                fusioncharts.render();
+                console.log("done rendering fusion charts");
+             }
+
+
             console.log("resultController");
             console.log("sampleValue = " + $rootScope.sampleValue);
             console.log("Search criteria object: ");
             console.log($rootScope.searchCriteria);
             $scope.requestedEvent = $rootScope.searchCriteria;
+            // Dominique
+            $scope.showSummary = true;
+            $scope.showOverview = false;
+            $scope.otherViewLabel = "Overview";
+            $scope.priceBiais = true;
+            $scope.flexBiais = false;
+            $scope.biaisLabel = "Flex Biais";
+            // note: this will have to be triggered when the results have been received from the server
 
+            $scope.selectFlight = function(flightIndex) {
+                $scope.flight = $scope.offer.flights[flightIndex];
+                 $rootScope.generateChart();
+            }
+
+             $scope.selectFlexOptions = function() {
+                console.log("selectFlexOptions");
+                $scope.flight = $scope.offer.flights[$scope.offer.flights.length -1];
+                $scope.hotel = $scope.offer.hotels[$scope.offer.hotels.length -1];
+                $scope.taxi = $scope.offer.taxis[$scope.offer.taxis.length -1];
+                 $rootScope.generateChart();
+
+             }
 
 
                       function selectOfferData(response){
                                           $scope.flight= response.flights[0];
+                                          console.log("flight:");
+                                          console.log($scope.flight);
+                                          console.log("flights:");
+                                          console.log(response.flights);
                                           $scope.hotel= response.hotels[0];
                                           $scope.ancillaries= response.ancillaries[0];
                                           $scope.taxi= response.taxis[0];
+                                          var total = 0;
+                                          total = $scope.flight.price +  $scope.hotel.price +$scope.taxi.price;
+                                          $scope.totalPrice= total;
+                                           $rootScope.generateChart();
                                      }
 
-//origin, numTrav, eventId
-                       function getOffer(eventId,origin){
-                                        $http.get("http://localhost:8080/offer/"+eventId+"/"+origin)
-                                                        .then(
-                                                            function successCallback(response) {
-                                                                console.log("Offer received:");
-                                                                console.log(response.data);
-                                                                $scope.offer=response.data;
-                                                                selectOfferData(response.data);
 
-                                                            },
-                                                            function errorCallback(response) {
-                                                                console.log("Unable to get event"+response);
-                                                                $scope.errorMessage = "Unable to get event";
-                                                            });
-
-                                        }
-
-
-
-
-                getOffer($scope.requestedEvent.id,$scope.requestedEvent.origin);
+                 selectOfferData($scope.offer );
 
        });
 

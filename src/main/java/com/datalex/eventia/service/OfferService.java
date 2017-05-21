@@ -1,6 +1,7 @@
 package com.datalex.eventia.service;
 
 import com.datalex.eventia.ApplicationProperties;
+import com.datalex.eventia.converter.AirShoppingRSOfferConverterService;
 import com.datalex.eventia.converter.ConvertService;
 import com.datalex.eventia.domain.*;
 import com.datalex.eventia.dto.predictHQ.Event;
@@ -32,7 +33,7 @@ public class OfferService {
     AirShoppingService airShoppingService;
 
     @Autowired
-    ConvertService<AirShoppingRS, Offer> airShopingRSOfferConverterService;
+    AirShoppingRSOfferConverterService airShopingRSOfferConverterService;
 
     @Autowired
     AirportLocatingService airportLocatingService;
@@ -77,14 +78,17 @@ public class OfferService {
             throw new IllegalArgumentException("Event not found : " + eventId);
         }
 
-        AirShoppingRQ rq = getAirShoppingRQ(origin, event);
+        Event e = predictHQEventService.getEventById(eventId);
+        String destination = findClosestJetBlueAirport(e);
+        AirShoppingRQ rq = getAirShoppingRQ(origin, e, destination);
 
         AirShoppingRS flights = airShoppingService.findFlights(rq);
-        Offer offer = airShopingRSOfferConverterService.convert(flights);
         Hotel hotel = hotelService.findHotels(event);
+
+        Offer offer = airShopingRSOfferConverterService.convert(flights, origin, destination);
+        offer.setAncillaries(createDummyAncillaries());
         offer.setHotels(Arrays.asList(hotel));
         offer.setTaxis(createDummyTaxis());
-        offer.setAncillaries(createDummyAncillaries());
         return offer;
     }
 
@@ -94,7 +98,7 @@ public class OfferService {
         anc.setDescription("Even more seats");
         anc.setPrice("20");
         list.add(anc);
-         anc = new Ancillary();
+        anc = new Ancillary();
         anc.setDescription("Even more speed");
         anc.setPrice("40");
         list.add(anc);
@@ -136,20 +140,10 @@ public class OfferService {
     }
 
 
-    public AirShoppingRQ getAirShoppingRQ(String origin, Event e) {
+    public AirShoppingRQ getAirShoppingRQ(String origin, Event e, String airport) {
         ZoneId zondIdDestinaion = ZoneId.of(e.getTimezone());
         LocalDate eventStartLocalDate = e.getStart().toInstant().atZone(zondIdDestinaion).toLocalDate();
         LocalDate eventEndLocalDate = e.getEnd().toInstant().atZone(zondIdDestinaion).toLocalDate();
-
-        String lon = e.getLocation().get(0);
-        String lat = e.getLocation().get(1);
-        Coordinate coordinate = new Coordinate(lon, lat);
-        List<String> airports = airportLocatingService.localNearestAirports(coordinate);
-
-        String airport = airports.stream()
-                                    .filter(ap -> properties.getPreLoadedCities().contains(ap))
-                                    .findFirst()
-                                    .orElse("");
 
         AirShoppingRQ rq = null;
         try {
@@ -171,13 +165,24 @@ public class OfferService {
         return rq;
     }
 
+    private String findClosestJetBlueAirport(Event e) {
+        String lon = e.getLocation().get(0);
+        String lat = e.getLocation().get(1);
+        Coordinate coordinate = new Coordinate(lon, lat);
+        List<String> airports = airportLocatingService.localNearestAirports(coordinate);
+
+        return airports.stream()
+                .filter(ap -> properties.getPreLoadedCities().contains(ap))
+                .findFirst()
+                .orElse("");
+    }
+
 
     public static void main(String... args){
 
         ZoneId id1 = ZoneId.of("America/New_York");
         System.out.println(id1);
     }
-
 
 
 }

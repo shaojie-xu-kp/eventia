@@ -21,13 +21,6 @@ public class OfferServiceTest {
     @Autowired
     EventService eventService;
 
-    @Test
-    public void testAirShoppingRQ()
-    {
-        AirShoppingRQ rq =  offerService.getAirShoppingRQ("BOS", eventService.getPreLoadedEvents().get(4));
-        // assert something
-    }
-
 
     @Test
     public void testOffer(){

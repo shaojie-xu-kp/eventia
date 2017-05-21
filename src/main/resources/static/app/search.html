@@ -24,21 +24,29 @@
                 </div>
             </div>
             <div class="row form-group" ng-if="eventSelectedFlag">
-                <div class="col-lg-3">
-                    <input ng-model="searchCriteria.origin" class="form-control form-fixer" ng-model="origin"
-                           placeholder="Origin" required autofocus>
+                <div class="col-lg-offset-1 col-lg-3">
+                    <div class="input-group">
+                        <span id="basic-addon1" class="input-group-addon">Origin</span>
+                        <input ng-model="searchCriteria.origin" class="form-control form-fixer" ng-model="origin" placeholder="Origin" required autofocus>
+                    </div>
                 </div>
                 <div class="col-lg-3" data-provide="datepicker">
-                    <input ng-model="searchCriteria.departureDate" id="dateArrival" name="dateArrival"
-                           class="form-control form-fixer date" placeholder="Arrival" required autofocus>
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar">
+                            </span>
+                        </span>
+                        <input ng-model="searchCriteria.departureDate" id="dateArrival" name="dateArrival" class="form-control form-fixer date" placeholder="Arrival" required autofocus>
+                    </div>
                 </div>
                 <div class="col-lg-3" data-provide="datepicker">
-                    <input ng-model="searchCriteria.arrivalDate" id="dateDeparture" name="dateDeparture"
-                           class="form-control form-fixer" placeholder="Departure" required autofocus>
-                </div>
-                <div class="col-lg-3">
-                    <input ng-model="searchCriteria.travelerNbr" class="form-control form-fixer"
-                           placeholder="Number of travellers" required autofocus>
+                    <div class="input-group">
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar">
+                            </span>
+                        </span>
+                        <input ng-model="searchCriteria.arrivalDate" id="dateDeparture" name="dateDeparture" class="form-control form-fixer" placeholder="Departure" required autofocus>
+                    </div>
                 </div>
             </div>
             <div class="row form-group">
@@ -47,6 +55,15 @@
                     </button>
                 </div>
             </div>
+            <div class="row form-group" >
+                <div class="col-lg-offset-3 col-lg-6 col-lg-offset-3">
+                    <div class="loader">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+
         </div>
     </form>
     <br>
