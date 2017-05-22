@@ -1,3 +1,6 @@
+
+
+
 .eventia-header {
     position: absolute;
     top: 0px;
@@ -48,17 +51,17 @@
 }
 
 .trip-info {
-    background-color: #E1E1EF;
+    background-color: white;
     padding: 20px;
     border: 1px solid silver;
 }
 
 .trip-detail {
-    background-color: #EFEFEF;
+    background: ghostwhite;;
 }
 
 .trip-controls {
-    background-color: none;
+    background-color: white;
     padding: 20px;
     border: 1px solid silver;
 }
@@ -158,7 +161,9 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
-
+.transparent {
+	background-color: rgba(255, 255, 255, 0.64)
+}
 
 .card.card--elevated-3 {
     box-shadow: 0 1px 3px 0 rgba(0,0,0,.25);
@@ -172,7 +177,7 @@ input:checked + .slider:before {
 }
 
 .loader {
-  color: #ffffff;
+  color: grey;
   font-size: 20px;
   margin: 100px auto;
   width: 1em;

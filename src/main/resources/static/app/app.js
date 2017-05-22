@@ -2,6 +2,7 @@
     // create the module and name it scotchApp
     var eventiaApp = angular.module('FlyrPOCApp', ['ngRoute','ngSanitize', 'ui.bootstrap']);
 
+
     // configure our routes
        eventiaApp.config(function($routeProvider) {
            $routeProvider
@@ -19,13 +20,15 @@
                })
        });
     console.log("app running");
+
        // create the controller and inject Angular's $scope
        eventiaApp.controller('mainController', function($scope) {
 
        });
 
        eventiaApp.controller('searchController', function($filter, $scope, $http, $timeout, $anchorScroll, $rootScope,$location) {
-        $scope.processingRequest = true;
+
+                    $scope.processingRequest = false;
                // sample utility function
                function initScopeVars() {
                    // this code won't run until someone calls this function
@@ -83,7 +86,7 @@
 
                    var availRequest = buildAvailRequest();
 
-                   $scope.processingRequest = true;
+
                    console.log("Ready to make avail request");
                    $http.post("http://10.160.7.156/tdprest-2/api/air/avail", availRequest)
                        .then(
@@ -91,12 +94,10 @@
                                console.log("AirAvailRS:");
                                console.log(response.data);
                                $scope.availResponse = response.data;
-                               $scope.processingRequest = false;
                            },
                            function errorCallback(response) {
                                console.log("Unable to get AirAvailRS");
                                console.log(reponse);
-                               $scope.processingRequest = false;
                                $scope.errorMessage = "Unable to get Availability";
                            });
 
@@ -151,24 +152,26 @@
        //            alert("2");
                }
                 function getOffer(eventId,origin){
+                    $scope.processingRequest = true;
                                         $http.get("http://localhost:8080/offer/"+eventId+"/"+origin)
 
 
                                     //$http.get("http://localhost:8085/offer")
                                                         .then(
                                                             function successCallback(response) {
-                                                            $scope.processingRequest = true;
+
                                                                 console.log("Offer received:");
                                                                 console.log(response.data);
                                                                $rootScope.offer=response.data;
                                                                $rootScope.offer.flights.sort($scope.sortFlightsByPrice);
                                                                console.log("loading...");
-                                                               $scope.processingRequest = false;
+                                                                 $scope.processingRequest = false;
                                                                 $location.path("/results");
                                                             },
                                                             function errorCallback(response) {
                                                                 console.log("Unable to get event"+response);
                                                                 $scope.errorMessage = "Unable to get event";
+                                                                 $scope.processingRequest = false;
                                                             });
 
                                         }
@@ -209,8 +212,11 @@
 
 
 
-       eventiaApp.controller('resultController', function($rootScope, $scope, $http, $timeout,  $location)  {
-
+       eventiaApp.controller('resultController', function($rootScope, $scope, $http, $timeout,  $location, $filter)  {
+                     Date.prototype.addHours = function (h){
+                          this.setTime(this.getTime() + (h*60*60*1000));
+                         return this;
+                   }
             // Dominique - moved init to the end of the controller definition
             // (so that all dependent functions have been defined)
 
@@ -230,10 +236,10 @@
                 $scope.priceBiais = !$scope.priceBiais;
                 $scope.flexBiais= !$scope.flexBiais;
                 if ($scope.priceBiais) {
-                    $scope.biaisLabel = "Flex Biais";
+                    $scope.biaisLabel = "Flex Bias";
                     selectOfferData($scope.offer);
                 } else {
-                    $scope.biaisLabel = "Price Biais";
+                    $scope.biaisLabel = "Price Bias";
                     $scope.selectFlexOptions();
                 }
             }
@@ -296,9 +302,6 @@
                             }, {
                             "label": "Hotel",
                             "value": $scope.hotel.price
-                            }, {
-                            "label": "Ancillaries",
-                            "value": "120"
                             }
                         ]
                     }
@@ -321,11 +324,19 @@
             $scope.otherViewLabel = "Overview";
             $scope.priceBiais = true;
             $scope.flexBiais = false;
-            $scope.biaisLabel = "Flex Biais";
+            $scope.biaisLabel = "Flex Bias";
             // note: this will have to be triggered when the results have been received from the server
 
             $scope.selectFlight = function(flightIndex) {
                 $scope.flight = $scope.offer.flights[flightIndex];
+                 var total = 0;
+                  total = $scope.flight.price +  $scope.hotel.price +$scope.taxi.price;
+                  $scope.totalPrice= total;
+                  var parts =$scope.flight.originDestinations[0].arrival.time.split(':');
+                  var pickupTime = new Date(0,0,0,parts[0],parts[1]);
+                  pickupTime.addHours(1);
+                  $scope.taxi.pickupTime = $filter('date')(pickupTime, "HH:mm");
+
                  $rootScope.generateChart();
             }
 
@@ -334,9 +345,15 @@
                 $scope.flight = $scope.offer.flights[$scope.offer.flights.length -1];
                 $scope.hotel = $scope.offer.hotels[$scope.offer.hotels.length -1];
                 $scope.taxi = $scope.offer.taxis[$scope.offer.taxis.length -1];
+                var total = 0;
+                total = $scope.flight.price +  $scope.hotel.price +$scope.taxi.price;
+                $scope.totalPrice= total;
+                 var parts =$scope.flight.originDestinations[0].arrival.time.split(':');
+                var pickupTime = new Date(0,0,0,parts[0],parts[1]);
+                 pickupTime.addHours(1);
+                $scope.taxi.pickupTime = $filter('date')(pickupTime, "HH:mm");
                  $rootScope.generateChart();
-
-             }
+              }
 
 
                       function selectOfferData(response){
@@ -348,10 +365,14 @@
                                           $scope.hotel= response.hotels[0];
                                           $scope.ancillaries= response.ancillaries[0];
                                           $scope.taxi= response.taxis[0];
+                                           var parts =$scope.flight.originDestinations[0].arrival.time.split(':');
+                                           var pickupTime = new Date(0,0,0,parts[0],parts[1]);
+                                           pickupTime.addHours(1);
+                                           $scope.taxi.pickupTime = $filter('date')(pickupTime, "HH:mm");
                                           var total = 0;
                                           total = $scope.flight.price +  $scope.hotel.price +$scope.taxi.price;
                                           $scope.totalPrice= total;
-                                           $rootScope.generateChart();
+                                          $rootScope.generateChart();
                                      }
 
 
