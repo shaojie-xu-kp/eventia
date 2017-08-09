@@ -12,8 +12,6 @@ import java.util.List;
  * Created by shaojie.xu on 20/05/2017.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Setter
-@Getter
 @Data
 public class HotelPriceInfo implements Comparable<HotelPriceInfo> {
 

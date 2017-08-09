@@ -1,4 +1,4 @@
-package com.datalex.eventia.dto.predictHQ;
+package com.datalex.eventia.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;

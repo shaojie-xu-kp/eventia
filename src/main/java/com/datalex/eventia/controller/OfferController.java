@@ -12,12 +12,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class OfferController {
 
-    @Autowired
-    OfferService offerService;
 
     @RequestMapping(value = "/offer/{event_id}/{origin}", method = RequestMethod.GET)
     @ResponseStatus( HttpStatus.OK )
     public Offer findOffer(@PathVariable( "origin" ) String origin, @PathVariable( "event_id" ) String eventId){
-        return offerService.getBestOffer(origin, eventId);
+        return null;
     }
 }

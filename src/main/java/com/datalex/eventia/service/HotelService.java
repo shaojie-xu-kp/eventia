@@ -2,14 +2,13 @@ package com.datalex.eventia.service;
 
 import com.datalex.eventia.ApplicationProperties;
 import com.datalex.eventia.domain.*;
-import com.datalex.eventia.dto.predictHQ.Event;
+import com.datalex.eventia.domain.Event;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
