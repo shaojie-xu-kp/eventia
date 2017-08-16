@@ -1,4 +1,4 @@
-package com.datalex.trip;
+package com.datalex.trip.config;
 
 
 import lombok.Getter;

@@ -1,6 +1,6 @@
 package com.datalex.trip.service;
 
-import com.datalex.trip.ApplicationProperties;
+import com.datalex.trip.config.ApplicationProperties;
 import com.datalex.trip.domain.Coordinate;
 import com.datalex.trip.dto.sita.Airport;
 import com.datalex.trip.dto.sita.SitaAirportResponse;
@@ -8,9 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Mono;
 
-import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -23,34 +24,36 @@ public class AirportLocatingService {
     RestTemplate restTemplate;
 
     @Autowired
+    WebClient webClient;
+
+    @Autowired
     ApplicationProperties applicationProperties;
 
     public static final String NO_AIRPORT_FOUND = "no airport found";
 
     private static final String SUCCESS_TRUE = "true";
 
-    private HttpHeaders headers;
-
-    @PostConstruct
-    private void init() {
-        headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        headers.add(applicationProperties.getSitaAuthorizationKey(), applicationProperties.getSitaAuthorizationValue());
-    }
 
     public static final String SLASH = "/";
 
     public List<String> localNearestAirports(Coordinate coordinate) {
 
+        String baseUrl = applicationProperties.getAirportLocatingCoordinateUrl()
+                + coordinate.getLatitude()
+                + SLASH
+                + coordinate.getLongitude();
+
+
         String request = UriComponentsBuilder
-                .fromHttpUrl(applicationProperties.getAirportLocatingCoordinateUrl()
-                        + coordinate.getLatitude()
-                        + SLASH
-                        + coordinate.getLongitude())
-                .queryParam("maxAirports", 10)
+                .fromHttpUrl(baseUrl)
                 .build()
                 .encode()
                 .toUriString();
+
+        HttpHeaders headers;
+        headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.add(applicationProperties.getSitaAuthorizationKey(), applicationProperties.getSitaAuthorizationValue());
 
         HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
         ResponseEntity<SitaAirportResponse> responseEntity = restTemplate.exchange(request, HttpMethod.GET, entity, SitaAirportResponse.class);
@@ -63,7 +66,29 @@ public class AirportLocatingService {
                         .collect(Collectors.toList());
             }
         }
+
         return Collections.singletonList(NO_AIRPORT_FOUND);
+
+    }
+
+
+    public Mono<SitaAirportResponse> localNearestAirportsAsyn(Coordinate coordinate) {
+
+        String baseUrl = applicationProperties.getAirportLocatingCoordinateUrl()
+                + coordinate.getLatitude()
+                + SLASH
+                + coordinate.getLongitude();
+
+        Mono<SitaAirportResponse> sitaAirportResponseFlux = webClient
+                .get()
+                .uri(baseUrl)
+                .accept(MediaType.APPLICATION_JSON)
+                .header(applicationProperties.getSitaAuthorizationKey(), applicationProperties.getSitaAuthorizationValue())
+                .exchange()
+                .flatMap(clientResponse -> clientResponse.bodyToMono(SitaAirportResponse.class))
+                .log();
+
+        return sitaAirportResponseFlux;
 
     }
 

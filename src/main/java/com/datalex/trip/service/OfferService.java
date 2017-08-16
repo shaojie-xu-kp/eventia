@@ -1,6 +1,6 @@
 package com.datalex.trip.service;
 
-import com.datalex.trip.ApplicationProperties;
+import com.datalex.trip.config.ApplicationProperties;
 import com.datalex.trip.converter.AirShoppingRSOfferConverterService;
 import com.datalex.trip.domain.*;
 import com.datalex.trip.domain.Event;
